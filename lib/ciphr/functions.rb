@@ -33,36 +33,35 @@ module Ciphr
     	end
     end
 
-    #util class
-    class ReversedFunction < ReversibleFunction
-      def initialize(f)
-        @f = f
+    class InvertibleFunction < Function
+      def invert
+        InvertedFunction.new(self)
       end
 
-      def apply()
-        @f.unapply()
-      end
 
-      def unapply()
-        @f.apply()
-      end
+      class InvertedFunction < InvertibleFunction
+        def initialize(f)
+          @f = f
+        end
+
+        def apply
+          @f.unapply
+        end
+
+        def unapply
+          @f.apply
+        end
+      end      
     end
 
-    class ReversibleFunction < Function
-      def reverse
-        ReversedFunction.new(self)
-      end
-    end
-
-
+   OPENSSL_DIGESTS = %w(md2 md4 md5 sha sha1 sha224 sha256 sha384 sha512)
 
     class Digest < Function
-      DIGESTS = %w(md2 md4 md5 sha sha1 sha224 sha256 sha384 sha512)
       def self.variants
-        DIGESTS.map{|d| [d, {:variant => d, :args => [:stream]}]}
+        OPENSSL_DIGESTS.map{|d| [d, {:variant => d, :args => [:stream]}]}
       end
 
-      def apply()
+      def apply
         digester = OpenSSL::Digest.new(@options[:variant])
         while chunk = @input.read(256)
           digester.update(chunk)
@@ -76,22 +75,48 @@ module Ciphr
       end
     end
 
-    class Base < ReversibleFunction
+    class HMAC < Digest
+      def self.variants
+        OPENSSL_DIGESTS.map{|d| ["hmac#{d}", {:variant => d, :args => [:stream, :stream]}]}        
+      end
+
+      def initialize(options, input, key)
+        super(options, input)
+        @key = key
+      end
+
+      # reuse code from Digest.apply
+      def apply
+        digester = OpenSSL::HMAC.new(@key, @options[:variant])
+        while chunk = @input.read(256)
+          digester.update(chunk)
+        end
+        digest = digester.digest
+        Proc.new do
+          d = digest
+          digest = nil
+          d
+        end
+      end
+    end
+
+    class Base < InvertibleFunction
 
     end
 
     class Base64 < Base
-      def apply()        
+      def apply    
         Proc.new do
           chunk = @input.read(3)
           chunk && ::Base64.encode64(chunk)
         end
       end
 
-      def unapply()
+      def unapply
         Proc.new do
           chunk = @input.read(4)
           chunk && ::Base64.decode64(chunk)
+        end
       end
 
       def self.variants
@@ -104,14 +129,14 @@ module Ciphr
         [['hex','b16','base16'], {:args => [:stream]}]
       end
 
-      def apply()
+      def apply
         Proc.new do
           chunk = @input.read(1)
           chunk && chunk.each_byte.map { |b| b.to_s(16) }.join
         end
       end
 
-      def unapply()
+      def unapply
         Proc.new do
           chunk = @input.read(2)
           chunk && chunk.scan(/../).map { |x| x.hex.chr }.join
@@ -119,13 +144,13 @@ module Ciphr
       end
     end
 
-    class Cipher < ReversibleFunction
+    class Cipher < InvertibleFunction
       def initialize(options, input, key)
         super(options, input)
         @key = key
       end
 
-      def apply()
+      def apply
         cipher = OpenSSL::Cipher.new(@options[:variant])
         cipher.encrypt
         cipher.key = @key.read(256)
@@ -136,7 +161,7 @@ module Ciphr
       end
 
       #TODO combine with encrypt/decrypt flag
-      def unapply()
+      def unapply
         cipher = OpenSSL::Cipher.new(@options[:variant])
         cipher.decrypt
         cipher.key = @key.read(256)
@@ -147,10 +172,11 @@ module Ciphr
       end      
 
       def self.variants
-      	OpenSSL::Cipher.ciphers.map{|c| c.downcase}.uniq.map do |c|
+        OpenSSL::Cipher.ciphers.map{|c| c.downcase}.uniq.map do |c|
           [c.gsub(/-/, ""), {:variant => c, :args => [:stream, :stream]}]
         end
       end
     end
+
   end
 end
