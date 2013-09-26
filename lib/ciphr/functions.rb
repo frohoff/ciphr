@@ -18,10 +18,13 @@ module Ciphr
       @function_variants = Hash[class_variants.flat_map{|c,v| [v[0]].flatten.map{|n| [n,[c, v[1]]]}}]
     end
 
+    def self.[](name)
+      @function_variants[name]
+    end
+
     class Function
-    	def initialize(options, input)
+    	def initialize(options)
     		@options = options
-    		@input = input
     	end
 
       def self.variants
@@ -33,7 +36,14 @@ module Ciphr
     	end
     end
 
-    class InvertibleFunction < Function
+    class UnaryFunction < Function
+      def initialize(options, input)
+        super(options)
+        @input = input
+      end
+    end
+
+    class InvertibleFunction < UnaryFunction
       def invert
         InvertedFunction.new(self)
       end
@@ -56,7 +66,7 @@ module Ciphr
 
    OPENSSL_DIGESTS = %w(md2 md4 md5 sha sha1 sha224 sha256 sha384 sha512)
 
-    class Digest < Function
+    class Digest < UnaryFunction
       def self.variants
         OPENSSL_DIGESTS.map{|d| [d, {:variant => d, :args => [:stream]}]}
       end
@@ -120,13 +130,13 @@ module Ciphr
       end
 
       def self.variants
-        [['b64','base64'], {:args => [:stream]}]
+        [[['b64','base64'], {:args => [:stream]}]]
       end
     end
 
     class Base16 < Base
       def self.variants
-        [['hex','b16','base16'], {:args => [:stream]}]
+        [[['hex','b16','base16'], {:args => [:stream]}]]
       end
 
       def apply
@@ -178,5 +188,50 @@ module Ciphr
       end
     end
 
+    class XOR < Cipher
+      def apply
+        Proc.new do
+          inchunk = @input.read(256)
+          keychunk = @input.read(256) 
+          #inchunk && keychunk && inchunk.size == keychunk.size && 
+          # TODO
+        end
+      end
+
+      def unapply
+        apply
+      end
+
+      def self.variants
+        [['xor', {:args => [:stream, :stream]}]]
+      end
+    end
+
+    class FileReader < Function
+      def self.variants
+        [['file',{}]]
+      end
+
+      def apply
+        f = File.new(options, "r")
+        Proc.new do
+          chunk = f.read(256)
+          f.clone if ! chunk
+          chunk
+        end
+      end
+    end
+
+    class StdInReader < Function
+      def self.variants
+        [['stdin',{}]]
+      end
+
+      def apply
+        Proc.new do
+          $stdin.read(256)
+        end
+      end
+    end
   end
 end

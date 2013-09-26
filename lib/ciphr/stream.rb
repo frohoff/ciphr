@@ -7,6 +7,7 @@ module Ciphr
     end
 
     def read(n)
+      init
       while @buffer.size < n && !@eof
         fill
       end
@@ -25,5 +26,26 @@ module Ciphr
         @eof = true if !data
         @buffer = @buffer + data if data
       end
+
+      def init
+        if @init
+          @init = true
+            @reader = @reader.apply if @reader.responds_to?(:apply)
+        end
+      end
+  end
+
+  class StringProc
+    def initialize(str)
+      @str = str
+    end
+
+    def call
+      begin
+        @str
+      ensure
+        @str = nil
+      end
+    end
   end
 end
