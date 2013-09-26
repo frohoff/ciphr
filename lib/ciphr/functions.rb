@@ -201,7 +201,19 @@ module Ciphr
         cipher.key = key.read
         Proc.new do
           chunk = input.read(256)
-          chunk ? cipher.update(chunk) : cipher.final
+          if cipher
+            if chunk
+              cipher.update(chunk)
+            else
+              begin
+                cipher.final
+              ensure
+                cipher = nil
+              end
+            end
+          else
+            nil
+          end
         end
       end
 
