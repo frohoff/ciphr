@@ -43,13 +43,13 @@ class CiphrTransformer < Parslet::Transform
 	rule(:b16 => simple(:v)) {|d| Ciphr::Functions::Base16.new({}, [Ciphr::Functions::StringReader.new({:string => d[:v]},[])]).tap{|f| f.invert = true} }
 	rule(:arguments => sequence(:arguments), :invert => simple(:invert), :name => simple(:name)) {|d|
 		klass, options = Ciphr::Functions[d[:name].to_s]
-		f = klass.new(options, dict[:arguments])
+		f = klass.new(options, d[:arguments])
 		f.invert = true if d[:invert]
 		f
 	}
 	rule(:arguments => simple(:arguments), :invert => simple(:invert), :name => simple(:name)) {|d|
 		klass, options = Ciphr::Functions[d[:name].to_s]
-		f = klass.new(options, dict[:arguments])
+		f = klass.new(options, [d[:arguments]])
 		f.invert = true if d[:invert]
 		f
 	}	
