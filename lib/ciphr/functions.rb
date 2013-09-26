@@ -48,25 +48,28 @@ module Ciphr
     end
 
     class InvertibleFunction < Function
-      def invert
-        InvertedFunction.new(self)
-      end
+      @invert = false
+      attr_accessor :invert
+
+      # def invert
+      #   InvertedFunction.new(self)
+      # end
 
 
-      class InvertedFunction < InvertibleFunction
-        def initialize(f)
-          super(nil,[])
-          @f = f
-        end
+      # class InvertedFunction < InvertibleFunction
+      #   def initialize(f)
+      #     super(nil,[])
+      #     @f = f
+      #   end
 
-        def apply
-          @f.unapply
-        end
+      #   def apply
+      #     @f.unapply
+      #   end
 
-        def unapply
-          @f.apply
-        end
-      end      
+      #   def unapply
+      #     @f.apply
+      #   end
+      # end      
     end
 
    OPENSSL_DIGESTS = %w(md2 md4 md5 sha sha1 sha224 sha256 sha384 sha512)
@@ -127,19 +130,26 @@ module Ciphr
     class Base64 < Base
       def apply    
         input = @args[0]
-        Proc.new do
-          chunk = input.read(3)
-          chunk && ::Base64.encode64(chunk).gsub(/\s/,'')
+        if !invert
+          Proc.new do
+            chunk = input.read(3)
+            chunk && ::Base64.encode64(chunk).gsub(/\s/,'')
+          end
+        else
+          Proc.new do
+            chunk = input.read(4)
+            chunk && ::Base64.decode64(chunk)
+          end
         end
       end
 
-      def unapply
-        input = @args[0]        
-        Proc.new do
-          chunk = input.read(4)
-          chunk && ::Base64.decode64(chunk)
-        end
-      end
+      # def unapply
+      #   input = @args[0]        
+      #   Proc.new do
+      #     chunk = input.read(4)
+      #     chunk && ::Base64.decode64(chunk)
+      #   end
+      # end
 
       def self.variants
         [[['b64','base64'], {}]]
@@ -160,27 +170,34 @@ module Ciphr
       end
 
       def apply
-        input = @args[0]        
-        Proc.new do
-          chunk = input.read(1)
-          chunk && chunk.each_byte.map { |b| b.to_s(16) }.join
+        input = @args[0]
+        if !invert              
+          Proc.new do
+            chunk = input.read(1)
+            chunk && chunk.unpack("H*")[0]
+          end
+        else
+          Proc.new do
+            chunk = input.read(2)
+            chunk && [chunk].pack("H*")
+          end
         end
       end
 
-      def unapply
-        input = @args[0]
-        Proc.new do
-          chunk = input.read(2)
-          chunk && chunk.scan(/../).map { |x| x.hex.chr }.join
-        end
-      end
+      # def unapply
+      #   input = @args[0]
+      #   Proc.new do
+      #     chunk = input.read(2)
+      #     chunk && [chunk].pack("H*")
+      #   end
+      # end
     end
 
     class Cipher < InvertibleFunction
       def apply
         input, key = @args
         cipher = OpenSSL::Cipher.new(@options[:variant])
-        cipher.encrypt
+        cipher.send(invert ? :decrypt : :encrypt)
         cipher.key = key.read
         Proc.new do
           chunk = input.read(256)
@@ -189,16 +206,16 @@ module Ciphr
       end
 
       #TODO combine with encrypt/decrypt flag
-      def unapply
-        input, key = @args
-        cipher = OpenSSL::Cipher.new(@options[:variant])
-        cipher.decrypt
-        cipher.key = key.read
-        Proc.new do
-          chunk = @input.read(256)
-          chunk ? cipher.update(chunk) : cipher.final
-        end
-      end      
+      # def unapply
+      #   input, key = @args
+      #   cipher = OpenSSL::Cipher.new(@options[:variant])
+      #   cipher.decrypt
+      #   cipher.key = key.read
+      #   Proc.new do
+      #     chunk = @input.read(256)
+      #     chunk ? cipher.update(chunk) : cipher.final
+      #   end
+      # end      
 
       def self.variants
         OpenSSL::Cipher.ciphers.map{|c| c.downcase}.uniq.map do |c|
@@ -221,9 +238,9 @@ module Ciphr
         end
       end
 
-      def unapply
-        apply
-      end
+      # def unapply
+      #   apply
+      # end
 
       def self.variants
         [['xor', {}]]
