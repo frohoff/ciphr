@@ -6,9 +6,9 @@ module Ciphr
       @eof = false
     end
 
-    def read(n)
+    def read(n=2^(8*8)) #fix this
       init
-      while @buffer.size < n && !@eof
+      while @buffer.size < n && !@eof 
         fill
       end
       if @buffer.size > 0
@@ -27,15 +27,15 @@ module Ciphr
         @buffer = @buffer + data if data
       end
 
-      def init
-        if @init
+      def init #hack
+        if !@init
           @init = true
-            @reader = @reader.apply if @reader.responds_to?(:apply)
+          @reader = @reader.apply if @reader.respond_to?(:apply)
         end
       end
   end
 
-  class StringProc
+  class StringProc #extend Proc?
     def initialize(str)
       @str = str
     end
