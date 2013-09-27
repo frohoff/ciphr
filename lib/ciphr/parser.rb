@@ -1,7 +1,7 @@
 require 'parslet'
 require 'pp'
 
-class CiphrParser < Parslet::Parser
+class Ciphr::Parser < Parslet::Parser
 
 	rule(:spaces)      { match('\s').repeat(1) }
 	rule(:spaces?)     { spaces.maybe }
@@ -18,19 +18,7 @@ class CiphrParser < Parslet::Parser
 	root :expression
 end
 
-
-class CipherPreprocessor < Parslet::Transform
-	rule(:operations => subtree(:operations)) {
-		segs = [operations].flatten
-		segs.unshift({:name => 'stdin', :invert => nil})
-		if segs.size > 1 
-			segs.inject{|m,o| puts o; o[:arguments] = [o[:arguments]||[]].flatten.unshift(m); o }
-		end
-		segs
-	}
-end
-
-class CiphrTransformer < Parslet::Transform
+class Ciphr::Transformer < Parslet::Transform
 	def self.stream(f) 
 		Ciphr::Stream.new(f)
 	end
@@ -59,8 +47,13 @@ class CiphrTransformer < Parslet::Transform
 		f.invert = true if d[:invert]
 		f
 	}	
-	rule(:operations => simple(:operation)) { operation }	
-	rule(:operations => sequence(:operations)) {|d|  
-		d[:operations].inject{|m,f| f.args = [f.args||[]].flatten.unshift(m); f }
-	}	
+	rule(:operations => simple(:operation)) {|d| transform_operations([d[:operation]])}
+	rule(:operations => sequence(:operations)) {|d| transform_operations(d[:operations])}	
+
+	def self.transform_operations(operations)
+		if operations[0].args.size < operations[0].params.size
+			operations.unshift(Ciphr::Functions::StdInReader.new({},[]))
+		end
+		operations.inject{|m,f| f.args = [f.args||[]].flatten.unshift(m); f }
+	end
 end

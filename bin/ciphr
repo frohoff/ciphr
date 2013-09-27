@@ -5,7 +5,7 @@ require 'ciphr'
 Ciphr::Functions.setup
 
 spec = ARGV.join(" ")
-parsed = CiphrParser.new.parse(spec)
-transformed = CiphrTransformer.new.apply(parsed)
+parsed = Ciphr::Parser.new.parse(spec)
+transformed = Ciphr::Transformer.new.apply(parsed)
 
 puts transformed.read
