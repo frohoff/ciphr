@@ -34,18 +34,4 @@ module Ciphr
         end
       end
   end
-
-  class StringProc #extend Proc?
-    def initialize(str)
-      @str = str
-    end
-
-    def call
-      begin
-        @str
-      ensure
-        @str = nil
-      end
-    end
-  end
 end

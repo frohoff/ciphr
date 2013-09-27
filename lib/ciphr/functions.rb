@@ -28,7 +28,7 @@ module Ciphr
         @args = args
         @stream = Ciphr::Stream.new(self)
     	end
-      attr_accessor :options, :args
+      attr_accessor :options, :args #don't like that these are both writable, but c'est la vie
 
       def self.variants
         []
@@ -267,6 +267,20 @@ module Ciphr
       def apply
         StringProc.new(options[:string])
       end
+
+      class StringProc #extend Proc?
+        def initialize(str)
+          @str = str
+        end
+
+        def call
+          begin
+            @str
+          ensure
+            @str = nil
+          end
+        end
+      end      
     end
 
     class FileReader < Function
@@ -292,5 +306,13 @@ module Ciphr
         end
       end
     end
+
+
+    #need streaming-capible impl before this is viable
+    # class Regex < Function
+    #   def apply
+    #     Regex.new(options[:search])
+    #   end
+    # end
   end
 end
