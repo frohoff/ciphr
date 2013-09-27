@@ -1,10 +1,7 @@
 require "ciphr/version"
-require "openssl"
-require "base64"
-require "stringio"
+require "ciphr/functions"
+require "ciphr/stream"
+require "ciphr/parser"
 
 module Ciphr
-
-
-
 end

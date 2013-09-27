@@ -1,0 +1,11 @@
+#!/usr/bin/env ruby
+
+require 'ciphr'
+
+Ciphr::Functions.setup
+
+spec = ARGV.join(" ")
+parsed = CiphrParser.new.parse(spec)
+transformed = CiphrTransformer.new.apply(parsed)
+
+puts transformed.read
