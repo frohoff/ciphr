@@ -26,14 +26,16 @@ class Ciphr::Parser < Parslet::Parser
 end
 
 class Ciphr::Transformer < Parslet::Transform
+
+
 	rule(:name => simple(:v)) { v }	
 	rule(:file => simple(:v)) {|d| Ciphr::Functions::FileReader.new({:file => d[:v].to_s}, [])}
 	#eagerly eval these?
 	rule(:string => simple(:v)) {|d| Ciphr::Functions::StringReader.new({:string => d[:v]},[]) }
-	rule(:b2 => simple(:v)) {|d| Ciphr::Functions::Base2.new({}, [Ciphr::Functions::StringReader.new({:string => d[:v].to_s.rjust(8,"0")},[])]).tap{|f| f.invert = true} }
-	rule(:b8 => simple(:v)) {|d| Ciphr::Functions::Base8.new({}, [Ciphr::Functions::StringReader.new({:string => d[:v].to_s.rjust(8,"0")},[])]).tap{|f| f.invert = true} }
+	rule(:b2 => simple(:v)) {|d| Ciphr::Functions::Base2.new({}, [Ciphr::Functions::StringReader.new({:string => lpad(d[:v].to_s,8,"0")},[])]).tap{|f| f.invert = true} }
+	rule(:b8 => simple(:v)) {|d| Ciphr::Functions::Base8.new({}, [Ciphr::Functions::StringReader.new({:string => lpad(d[:v].to_s,8,"0")},[])]).tap{|f| f.invert = true} }
 	#rule(:b10 => simple(:v)) {|d| }
-	rule(:b16 => simple(:v)) {|d| Ciphr::Functions::Base16.new({}, [Ciphr::Functions::StringReader.new({:string => d[:v].to_s.rjust(2,"0")},[])]).tap{|f| f.invert = true} }
+	rule(:b16 => simple(:v)) {|d| Ciphr::Functions::Base16.new({}, [Ciphr::Functions::StringReader.new({:string => lpad(d[:v].to_s,2,"0")},[])]).tap{|f| f.invert = true} }
 	#b32
 	rule(:b64 => simple(:v)) {|d| Ciphr::Functions::Base64.new({}, [Ciphr::Functions::StringReader.new({:string => d[:v]},[])]).tap{|f| f.invert = true} }
 	rule(:arguments => sequence(:arguments), :invert => simple(:invert), :name => simple(:name)) {|d| transform_call(d) }
@@ -41,6 +43,10 @@ class Ciphr::Transformer < Parslet::Transform
 	rule(:invert => simple(:invert), :name => simple(:name)) {|d| transform_call(d) }
 	rule(:operations => simple(:operations)) {|d| transform_operations(d)}
 	rule(:operations => sequence(:operations)) {|d| transform_operations(d)}	
+
+	def self.lpad(s,n,p)
+		s.size % n == 0 ? s : p * (n - s.size % n) + s
+	end
 
 	def self.transform_operations(d)
 		operations = [d[:operations]].flatten
