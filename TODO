@@ -1,0 +1,136 @@
+TODO:
+==========================
+fix
+-----------
+
+robustness
+-----------
+* graceful handling of mismatched data size (key size, base64 chunks, xor)
+* errors for bad function name or args
+* shell friendly alternate delimiters
+* optional spaces in grammar
+* CLI options
+* help with function list
+* cat/noop (for testing)
+stdout
+
+completeness
+-----------
+base64 variants
+* %/url, b32, ascii85, escape-sequence (\x, String.dump), xml/html, unicode encoding, other stuff in ruby's Encoding class
+* xor (variants for mismatched lengths?)
+
+
+features
+---------------
+caeser/rot ciphers
+head/tail/substring for streams
+extension mechanism (via other gems or simple files)
+decimal/octal/binary literals and conversions
+allow \x escaping in string literals
+non pipe statements
+variable writing/reading
+regex search/replace support
+fn for executing shell/ruby
+crypt/scrypt/bcrypt/pbkdf support
+multi-round hash support
+`strings` extraction
+stream reversing (big buffering)
+binary boolean ops (and/or/not)
+gzip/deflate
+
+cleanliness
+-----------
+refactor variable buffering (probably will improve perf)
+break up functions
+
+
+
+
+
+scratch notes
+==========================
+
+
+
+
+
+
+
+
+~b64,hmac(abcd,~b64),b16,xor(deef,~b64)
+~des
+
+=abcd/^hex/b64/hmac[=abcd/^b64]=/
+
+{abcd},~hex,b64/hmac-sha1[[{abcd},b64]]
+
+=abcd ~hex hmac[=foo] ?key
+
+~[],?@^#{}
+
+
+0x01
+
+
+
+foo#bar^baz[]
+foo;bar|baz()
+
+(foo|bar)|baz
+
+((foo)|bar)|baz
+
+assign var:		?varname
+ref var:		#varname
+literal:		=value
+separator:		" "
+file reference:	@filepath
+
+% in url
+used in b64: 	_-:!/.+=
+shell ok: 		~,.-_{}[]/?%#@^+=:
+shell not ok: 	()|!$&*\;'"<>` 
+
+	sh 	b64
+`		x
+~	x 	x
+!	
+@	x 	x
+#	x 	x
+$	 	x
+%	x 	x
+^	x 	x
+&	 	x
+*	 	x
+()	 	x
+-	x 	
+_	x 	
+=	x 	b
++	x 	
+[]	x 	x
+{}	x 	x
+;	 	x
+:	x 	
+'		x
+"	 	x
+,	x 	x
+.	x 	
+/	x 
+<>	 	x
+?	x 	x
+
+
+
+x(a)|y(b)|z(c)
+
+
+
+					z
+			
+			y				c
+	
+		x		b
+
+	a
+

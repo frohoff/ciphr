@@ -6,7 +6,7 @@ module Ciphr
       @eof = false
     end
 
-    def read(n=2^(8*8)) #fix this
+    def read(n=2**(8*4)) #fix this
       init
       while @buffer.size < n && !@eof 
         fill

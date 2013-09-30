@@ -49,30 +49,27 @@ module Ciphr
 
     class InvertibleFunction < Function
       @invert = false
-      attr_accessor :invert
-
-      # def invert
-      #   InvertedFunction.new(self)
-      # end
-
-
-      # class InvertedFunction < InvertibleFunction
-      #   def initialize(f)
-      #     super(nil,[])
-      #     @f = f
-      #   end
-
-      #   def apply
-      #     @f.unapply
-      #   end
-
-      #   def unapply
-      #     @f.apply
-      #   end
-      # end      
+      attr_accessor :invert    
     end
 
-   OPENSSL_DIGESTS = %w(md2 md4 md5 sha sha1 sha224 sha256 sha384 sha512)
+    class Cat < Function
+      def self.variants
+        [['cat','noop'], {}]
+      end
+
+      def params
+        [:input]
+      end
+
+      def apply
+        input = @args[0]
+        Proc.new do
+          input.read(256)
+        end
+      end
+    end 
+
+    OPENSSL_DIGESTS = %w(md2 md4 md5 sha sha1 sha224 sha256 sha384 sha512)
 
     class Digest < Function
       def self.variants
@@ -138,18 +135,11 @@ module Ciphr
         else
           Proc.new do
             chunk = input.read(4)
+            chunk = chunk && chunk + "="*(4-chunk.size) #pad
             chunk && ::Base64.decode64(chunk)
           end
         end
       end
-
-      # def unapply
-      #   input = @args[0]        
-      #   Proc.new do
-      #     chunk = input.read(4)
-      #     chunk && ::Base64.decode64(chunk)
-      #   end
-      # end
 
       def self.variants
         [[['b64','base64'], {}]]
@@ -162,7 +152,7 @@ module Ciphr
 
     class Base16 < Base
       def self.variants
-        [[['hex','b16','base16'], {}]]
+        [[['hex','hexidecimal','b16','base16'], {}]]
       end
 
       def params
@@ -183,15 +173,57 @@ module Ciphr
           end
         end
       end
-
-      # def unapply
-      #   input = @args[0]
-      #   Proc.new do
-      #     chunk = input.read(2)
-      #     chunk && [chunk].pack("H*")
-      #   end
-      # end
     end
+
+    class Base8 < Base
+      def self.variants
+        [[['oct','octal','b8','base8'], {}]]
+      end
+
+      def params
+        [:arguments]
+      end
+
+      def apply
+        input = @args[0]
+        if !invert              
+          Proc.new do
+            chunk = input.read(1)
+            #chunk && #
+          end
+        else
+          Proc.new do
+            chunk = input.read(3)
+            chunk && [chunk.to_i(8).to_s(16)].pack("H*")
+          end
+        end
+      end
+    end   
+
+    class Base2 < Base
+      def self.variants
+        [[['bin','binary','b2','b2'], {}]]
+      end
+
+      def params
+        [:arguments]
+      end
+
+      def apply
+        input = @args[0]
+        if !invert              
+          Proc.new do
+            chunk = input.read(1)
+            chunk && chunk.unpack("B*")[0]
+          end
+        else
+          Proc.new do
+            chunk = input.read(8)
+            chunk && [chunk].pack("B*")
+          end
+        end
+      end
+    end    
 
     class Cipher < InvertibleFunction
       def apply
@@ -217,18 +249,6 @@ module Ciphr
         end
       end
 
-      #TODO combine with encrypt/decrypt flag
-      # def unapply
-      #   input, key = @args
-      #   cipher = OpenSSL::Cipher.new(@options[:variant])
-      #   cipher.decrypt
-      #   cipher.key = key.read
-      #   Proc.new do
-      #     chunk = @input.read(256)
-      #     chunk ? cipher.update(chunk) : cipher.final
-      #   end
-      # end      
-
       def self.variants
         OpenSSL::Cipher.ciphers.map{|c| c.downcase}.uniq.map do |c|
           [c.gsub(/-/, ""), {:variant => c}]
@@ -240,19 +260,23 @@ module Ciphr
       end
     end
 
+
     class XOR < Cipher
       def apply
+        input,keyinput = @args
+        key = keyinput.read
         Proc.new do
-          inchunk = @input.read(256)
-          keychunk = @input.read(256) 
-          #inchunk && keychunk && inchunk.size == keychunk.size && 
-          # TODO
+          inchunk = input.read(key.size)
+          if inchunk
+            a,b=[inchunk,key].sort{|s|s.size}
+            a.bytes.each_with_index.map{|c,i|c^b.bytes.to_a[i%b.size]}.pack("c*")
+            #inchunk && keychunk && inchunk.size == keychunk.size && 
+            # TODO
+          else
+            nil
+          end
         end
       end
-
-      # def unapply
-      #   apply
-      # end
 
       def self.variants
         [['xor', {}]]
@@ -285,10 +309,10 @@ module Ciphr
 
     class FileReader < Function
       def apply
-        f = File.new(options[:filename], "r")
+        f = File.open(options[:file], "r")
         Proc.new do
           chunk = f.read(256)
-          f.clone if ! chunk
+          f.close if ! chunk
           chunk
         end
       end
