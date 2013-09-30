@@ -6,18 +6,26 @@ module Ciphr
       @eof = false
     end
 
-    def read(n=2**(8*4)) #fix this
-      init
-      while @buffer.size < n && !@eof 
-        fill
+    def read(n=nil) #fix this
+      if n
+        init
+        while @buffer.size < n && !@eof 
+          fill
+        end
+        if @buffer.size > 0
+          ret = @buffer[0,n]
+          @buffer = @buffer[n..-1] || ''
+        else 
+          ret = nil
+        end
+        ret
+      else
+        buff = ""
+        while chunk=read(256)
+          buff+=chunk
+        end
+        buff 
       end
-      if @buffer.size > 0
-        ret = @buffer[0,n]
-        @buffer = @buffer[n..-1] || ''
-      else 
-        ret = nil
-      end
-      ret
     end
 
     private
