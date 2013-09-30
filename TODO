@@ -38,6 +38,7 @@ stream reversing (big buffering)
 binary boolean ops (and/or/not)
 gzip/deflate
 reverse bits/nibbles/bytes	
+high level classification of functions
 
 cleanliness
 -----------
