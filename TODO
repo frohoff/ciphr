@@ -32,7 +32,7 @@ functions
     crc/adler
     crypt/scrypt/bcrypt/pbkdf
   ciphers
-    caeser/rot
+    substitution: caeser/rot/dvorak/vigenère
   byte ops
     prepend/append
     indexed head/tail/substring
