@@ -188,13 +188,15 @@ module Ciphr
         input = @args[0]
         if !invert              
           Proc.new do
-            chunk = input.read(1)
-            #chunk && #
+            chunk = input.read(3)
+            chunk = chunk && chunk + "\x00"*(3-chunk.size) #pad
+            chunk && chunk.unpack("B*")[0].bytes.to_a.each_slice(3).to_a.map{|a|a.pack("c*").to_i(2).to_s(8)}.join
           end
         else
           Proc.new do
-            chunk = input.read(3)
-            chunk && [chunk.to_i(8).to_s(16)].pack("H*")
+            chunk = input.read(8)
+            chunk = chunk && chunk + "0"*(8-chunk.size) #pad
+            chunk && chunk.unpack("aaaaaaaa").map{|o| o.to_i.to_s(2).rjust(3,"0")}.join.unpack("a8a8a8").map{|b| b.to_i(2)}.pack("C*")
           end
         end
       end
