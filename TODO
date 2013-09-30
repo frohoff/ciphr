@@ -11,6 +11,8 @@ robustness
 * optional spaces in grammar
 * CLI options
 * help with function list
+* case insensitivity for ~b16
+* high level classification of functions
 stdout
 
 completeness
@@ -22,32 +24,42 @@ base64 variants
 
 features
 ---------------
-prepend/append
-caeser/rot ciphers
-head/tail/substring for streams
+functions
+  bitwise ops
+    shift right/left (full rotate vs fill)
+    not/and/or (similar to xor)
+  hashes  
+    crc/adler
+    crypt/scrypt/bcrypt/pbkdf
+  ciphers
+    caeser/rot
+  byte ops
+    prepend/append
+    indexed head/tail/substring
+    reverse bits/nibbles/bytes	
+  base
+    decimal
+  compression
+    gzip/deflate
+
 extension mechanism (via other gems or simple files)
-decimal/octal/binary literals and conversions
 allow \x escaping in string literals
 non pipe statements
 variable writing/reading
+
+
+random ideas
+-------------
+`strings` extraction
 regex search/replace support
 fn for executing shell/ruby
-crypt/scrypt/bcrypt/pbkdf support
 multi-round hash support
-`strings` extraction
-stream reversing (big buffering)
-binary boolean ops (and/or/not)
-gzip/deflate
-reverse bits/nibbles/bytes	
-high level classification of functions
+
 
 cleanliness
 -----------
 refactor variable buffering (probably will improve perf)
 break up functions
-
-
-
 
 
 scratch notes
@@ -59,10 +71,6 @@ scratch notes
 
 1 2 3 4 5 6 7 8*1 2 3 4 5 6 7 8*1 2 3 4 5 6 7 8
 1 2 3*1 2 3*1 2 3*1 2 3*1 2 3*1 2 3*1 2 3*1 2 3
-
-
-
-
 
 
 ~b64,hmac(abcd,~b64),b16,xor(deef,~b64)
