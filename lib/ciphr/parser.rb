@@ -10,11 +10,11 @@ class Ciphr::Parser < Parslet::Parser
 
 	rule(:name) { (match('[a-z]') >> match('[a-z0-9]').repeat).as(:name) }	
 	rule(:literal) { b2 | b8 | b10 | b16 | b64 | string | file }
-	rule(:file) { str('@') >> (	string | match('[^ ()\[\]{},|]' ).repeat ).as(:file) }  #TODO implement
+	rule(:file) { str('@') >> (	string | match('[^ ()\[\]{},|]' ).repeat ).as(:file) }
 	rule(:string) { str('"') >> ( str('\\') >> any | str('"').absent? >> any ).repeat.maybe.as(:string) >> str('"') }
 	rule(:b2) { str('0b') >> match('[0-1]').repeat(1).as(:b2) }
 	rule(:b8) { ( match('0').repeat(1) >> match('o').maybe >> match('[0-7]').repeat(1).as(:b8) ) }
-	rule(:b10) { ( match('[1-9]') >> match('[0-9]').repeat ).as(:b10) } #not sure how possible this is
+	rule(:b10) { ( match('[1-9]') >> match('[0-9]').repeat ).as(:b10) }
 	rule(:b16) { str('0x') >> match('[0-9a-f]').repeat(1).as(:b16) }
 	#b32
 	rule(:b64) { str('=') >> match('[0-9a-zA-Z+/=]').repeat(1).as(:b64) }

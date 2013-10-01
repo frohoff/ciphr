@@ -175,7 +175,7 @@ module Ciphr
       end
     end
 
-
+#WARN about buffering all input
     class Base10 < Base
       def self.variants
         [[['dec','decimal','b10','base10'], {}]]
