@@ -39,6 +39,8 @@ $ ciphr '"abc"|hex'
 616263
 $ ciphr '"abc"|hex|~hex'
 abc
+$ ciphr '"616263"|~hex'
+abc
 $ ciphr '0x616263'
 abc
 $ ciphr '0x616263|hex'
