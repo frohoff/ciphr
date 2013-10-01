@@ -175,6 +175,48 @@ module Ciphr
       end
     end
 
+
+    class Base10 < Base
+      def self.variants
+        [[['dec','decimal','b10','base10'], {}]]
+      end
+
+      def params
+        [:arguments]
+      end
+
+      def apply
+        input = @args[0]
+        if !invert     
+          num = 0      
+          while chunk = input.read(1)
+            num = (num << 8) + chunk.bytes.to_a[0] || num.to_s(10)
+          end
+          Proc.new do
+            begin
+              num && num.to_s(10) || num
+            ensure
+              num = nil
+            end
+          end
+        else
+          num = input.read().to_i(10)
+          bytes = []
+          while num > 0
+            bytes.unshift(num & 0xff)
+            num = num >> 8
+          end
+          Proc.new do
+            begin
+              bytes && bytes.pack("c*") || bytes
+            ensure
+              bytes = nil
+            end
+          end
+        end
+      end
+    end
+
     class Base8 < Base
       def self.variants
         [[['oct','octal','b8','base8'], {}]]

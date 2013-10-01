@@ -9,12 +9,12 @@ class Ciphr::Parser < Parslet::Parser
 	rule(:spaces?)     { spaces.maybe }
 
 	rule(:name) { (match('[a-z]') >> match('[a-z0-9]').repeat).as(:name) }	
-	rule(:literal) { b2 | b8 | b16 | b64 | string | file }
+	rule(:literal) { b2 | b8 | b10 | b16 | b64 | string | file }
 	rule(:file) { str('@') >> (	string | match('[^ ()\[\]{},|]' ).repeat ).as(:file) }  #TODO implement
 	rule(:string) { str('"') >> ( str('\\') >> any | str('"').absent? >> any ).repeat.maybe.as(:string) >> str('"') }
 	rule(:b2) { str('0b') >> match('[0-1]').repeat(1).as(:b2) }
-	rule(:b8) { ( match('0').repeat(1) >> match('[0-7]').repeat(1).as(:b8) ) }
-	#rule(:b10) { ( match('[1-9]') >> match('[0-9]').repeat ).as(:b10) } #not sure how possible this is
+	rule(:b8) { ( match('0').repeat(1) >> match('o').maybe >> match('[0-7]').repeat(1).as(:b8) ) }
+	rule(:b10) { ( match('[1-9]') >> match('[0-9]').repeat ).as(:b10) } #not sure how possible this is
 	rule(:b16) { str('0x') >> match('[0-9a-f]').repeat(1).as(:b16) }
 	#b32
 	rule(:b64) { str('=') >> match('[0-9a-zA-Z+/=]').repeat(1).as(:b64) }
@@ -34,7 +34,7 @@ class Ciphr::Transformer < Parslet::Transform
 	rule(:string => simple(:v)) {|d| Ciphr::Functions::StringReader.new({:string => d[:v]},[]) }
 	rule(:b2 => simple(:v)) {|d| Ciphr::Functions::Base2.new({}, [Ciphr::Functions::StringReader.new({:string => lpad(d[:v].to_s,8,"0")},[])]).tap{|f| f.invert = true} }
 	rule(:b8 => simple(:v)) {|d| Ciphr::Functions::Base8.new({}, [Ciphr::Functions::StringReader.new({:string => lpad(d[:v].to_s,8,"0")},[])]).tap{|f| f.invert = true} }
-	#rule(:b10 => simple(:v)) {|d| }
+	rule(:b10 => simple(:v)) {|d| Ciphr::Functions::Base10.new({}, [Ciphr::Functions::StringReader.new({:string => d[:v].to_s},[])]).tap{|f| f.invert = true} }
 	rule(:b16 => simple(:v)) {|d| Ciphr::Functions::Base16.new({}, [Ciphr::Functions::StringReader.new({:string => lpad(d[:v].to_s,2,"0")},[])]).tap{|f| f.invert = true} }
 	#b32
 	rule(:b64 => simple(:v)) {|d| Ciphr::Functions::Base64.new({}, [Ciphr::Functions::StringReader.new({:string => d[:v]},[])]).tap{|f| f.invert = true} }
