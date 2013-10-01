@@ -71,7 +71,7 @@ module Ciphr
 
     OPENSSL_DIGESTS = %w(md2 md4 md5 sha sha1 sha224 sha256 sha384 sha512)
 
-    class Digest < Function
+    class OpenSslDigest < Function
       def self.variants
         OPENSSL_DIGESTS.map{|d| [d, {:variant => d}]}
       end
@@ -95,7 +95,7 @@ module Ciphr
       end
     end
 
-    class HMAC < Digest
+    class OpenSslHmac < OpenSslDigest
       def self.variants
         OPENSSL_DIGESTS.map{|d| ["hmac#{d}", {:variant => d}]}        
       end
@@ -269,7 +269,7 @@ module Ciphr
       end
     end    
 
-    class Cipher < InvertibleFunction
+    class OpenSslCipher < InvertibleFunction
       def apply
         input, key = @args
         cipher = OpenSSL::Cipher.new(@options[:variant])
@@ -305,7 +305,7 @@ module Ciphr
     end
 
 
-    class XOR < Cipher
+    class XOR
       def apply
         input,keyinput = @args
         key = keyinput.read
