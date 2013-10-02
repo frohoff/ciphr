@@ -27,10 +27,10 @@ end
 
 class Ciphr::Transformer < Parslet::Transform
 
-
 	rule(:name => simple(:v)) { v }	
 	rule(:file => simple(:v)) {|d| Ciphr::Functions::FileReader.new({:file => d[:v].to_s}, [])}
 	#eagerly eval these?
+	#trim to nearest byte vs chunk?
 	rule(:string => simple(:v)) {|d| Ciphr::Functions::StringReader.new({:string => d[:v]},[]) }
 	rule(:b2 => simple(:v)) {|d| Ciphr::Functions::Base2.new({}, [Ciphr::Functions::StringReader.new({:string => lpad(d[:v].to_s,8,"0")},[])]).tap{|f| f.invert = true} }
 	rule(:b8 => simple(:v)) {|d| Ciphr::Functions::Base8.new({}, [Ciphr::Functions::StringReader.new({:string => lpad(d[:v].to_s,8,"0")},[])]).tap{|f| f.invert = true} }

@@ -314,8 +314,7 @@ module Ciphr
       end
     end
 
-
-    class XOR
+    class Bitwise < Function
       def apply
         input,keyinput = @args
         key = keyinput.read
@@ -323,9 +322,7 @@ module Ciphr
           inchunk = input.read(key.size)
           if inchunk
             a,b=[inchunk,key].sort{|s|s.size}
-            a.bytes.each_with_index.map{|c,i|c^b.bytes.to_a[i%b.size]}.pack("c*")
-            #inchunk && keychunk && inchunk.size == keychunk.size && 
-            # TODO
+            a.bytes.each_with_index.map{|c,i|c.send(@options[:op], b.bytes.to_a[i%b.size])}.pack("c*")
           else
             nil
           end
@@ -333,7 +330,11 @@ module Ciphr
       end
 
       def self.variants
-        [['xor', {}]]
+        [
+          ['and', {:op=>:&}],
+          ['or', {:op=>:|}],
+          [['xor'], {:op=>:'^'}]
+        ]
       end
 
       def self.params
@@ -371,7 +372,6 @@ module Ciphr
         end
       end
     end
-
 
     class StdInReader < Function
       def apply
