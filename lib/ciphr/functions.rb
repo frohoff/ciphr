@@ -16,10 +16,12 @@ module Ciphr
 
     def self.setup(classes=@function_classes)
       @functions = @function_classes.map{|c| [c,c.variants]}.select{|a| a[1] && a[1].size > 0}.map{|a| 
-                        [a[0], a[1].map{|v| [[v[0]].flatten, v[1]]}]
-                      }
+                        [a[0], a[1].map{|v| [[v[0]].flatten.uniq, v[1]]}]}
+      @function_aliases = Hash[@functions.map{|c,vs| vs.map{|v| [v[0]].flatten.map{|n| [n,[c, v[1]]]}}.flatten(1)}.flatten(1)]
+    end
 
-      @function_aliases = Hash[@functions.flat_map{|c,vs| vs.map{|v| [v[0]].flatten.map{|n| [n,[c, v[1]]]}}}]
+    def self.function_aliases
+      @function_aliases
     end
 
     def self.[](name)
@@ -105,7 +107,7 @@ module Ciphr
 
     class OpenSslHmac < OpenSslDigest
       def self.variants
-        OPENSSL_DIGESTS.map{|d| ["hmac#{d}", {:variant => d}]}        
+        OPENSSL_DIGESTS.map{|d| [["hmac-#{d}", "hmac#{d}"], {:variant => d}]}        
       end
 
       def self.params 
@@ -303,7 +305,7 @@ module Ciphr
 
       def self.variants
         OpenSSL::Cipher.ciphers.map{|c| c.downcase}.uniq.map do |c|
-          [c.gsub(/-/, ""), {:variant => c}]
+          [[c, c.gsub(/-/, "")], {:variant => c}]
         end
       end
 
