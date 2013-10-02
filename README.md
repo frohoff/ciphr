@@ -11,20 +11,6 @@ an experimental toy as no effort was made to make included cryptographic
 functions robust against attacks (timing attacks, etc), and it is recommended 
 not to use any included functions in any on-line security mechanisms.
 
-## Installation
-
-Must be cloned and installed until it gets into rubygems.org after being cleaned
-up
-
-Requires bundler to be installed (`gem install bundler`)
-
-```shell
-git clone https://github.com/frohoff/ciphr.git
-cd ciphr
-bundle install
-rake install
-```
-
 ## Examples
 
 ```shell
@@ -68,6 +54,20 @@ $ echo -n "abc" | ciphr 'aes128cbc("super secret key")|hex'
 8ad54a1a16c4963a231beb69e0888a8f
 $ echo -n "abc" | ciphr 'aes128cbc("super secret key")|hex|~hex|~aes128cbc("super secret key")'
 abc
+```
+
+## Installation
+
+Must be cloned and installed until it gets into rubygems.org after being cleaned
+up
+
+Requires bundler to be installed (`gem install bundler`)
+
+```shell
+git clone https://github.com/frohoff/ciphr.git
+cd ciphr
+bundle install
+rake install
 ```
 
 ## Usage
