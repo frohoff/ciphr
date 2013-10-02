@@ -7,8 +7,8 @@ require 'slop'
 
 Slop.parse do
   banner "Usage: #{File.basename $0} [options] [spec]"
-  on :v, :verbose
   on :h, :help
+  on :v, :verbose
   on :n, :'no-newline'
 
   run do |opts, args|
