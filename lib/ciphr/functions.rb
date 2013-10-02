@@ -79,6 +79,183 @@ module Ciphr
       end
     end 
 
+    class Base < InvertibleFunction
+    end
+
+    class Base2 < Base
+      def self.variants
+        [[['b2','base2', 'bin','binary'], {}]]
+      end
+
+      def self.params
+        [:input]
+      end
+
+      def apply
+        input = @args[0]
+        if !invert              
+          Proc.new do
+            chunk = input.read(1)
+            chunk && chunk.unpack("B*")[0]
+          end
+        else
+          Proc.new do
+            chunk = input.read(8)
+            chunk && [chunk].pack("B*")
+          end
+        end
+      end
+    end
+
+    class Base8 < Base
+      def self.variants
+        [[['b8','base8','oct','octal'], {}]]
+      end
+
+      def self.params
+        [:input]
+      end
+
+      def apply
+        input = @args[0]
+        if !invert              
+          Proc.new do
+            chunk = input.read(3)
+            chunk = chunk && chunk + "\x00"*(3-chunk.size) #pad
+            chunk && chunk.unpack("B*")[0].bytes.to_a.each_slice(3).to_a.map{|a|a.pack("c*").to_i(2).to_s(8)}.join
+          end
+        else
+          Proc.new do
+            chunk = input.read(8)
+            chunk = chunk && chunk + "0"*(8-chunk.size) #pad
+            chunk && chunk.unpack("aaaaaaaa").map{|o| o.to_i.to_s(2).rjust(3,"0")}.join.unpack("a8a8a8").map{|b| b.to_i(2)}.pack("C*")
+          end
+        end
+      end
+    end   
+
+#WARN about buffering all input
+    class Base10 < Base
+      def self.variants
+        [[['b10','base10','dec','decimal'], {}]]
+      end
+
+      def self.params
+        [:input]
+      end
+
+      def apply
+        input = @args[0]
+        if !invert     
+          num = 0      
+          while chunk = input.read(1)
+            num = (num << 8) + chunk.bytes.to_a[0] || num.to_s(10)
+          end
+          Proc.new do
+            begin
+              num && num.to_s(10) || num
+            ensure
+              num = nil
+            end
+          end
+        else
+          num = input.read().to_i(10)
+          bytes = []
+          while num > 0
+            bytes.unshift(num & 0xff)
+            num = num >> 8
+          end
+          Proc.new do
+            begin
+              bytes && bytes.pack("c*") || bytes
+            ensure
+              bytes = nil
+            end
+          end
+        end
+      end
+    end
+
+    class Base16 < Base
+      def self.variants
+        [[['b16','base16','hex','hexidecimal'], {}]]
+      end
+
+      def self.params
+        [:input]
+      end
+
+      def apply
+        input = @args[0]
+        if !invert              
+          Proc.new do
+            chunk = input.read(1)
+            chunk && chunk.unpack("H*")[0]
+          end
+        else
+          Proc.new do
+            chunk = input.read(2)
+            chunk && [chunk].pack("H*")
+          end
+        end
+      end
+    end
+
+    class Base64 < Base
+      def apply    
+        input = @args[0]
+        if !invert
+          Proc.new do
+            chunk = input.read(3)
+            chunk && ::Base64.encode64(chunk).gsub(/\s/,'')
+          end
+        else
+          Proc.new do
+            chunk = input.read(4)
+            chunk = chunk && chunk + "="*(4-chunk.size) #pad
+            chunk && ::Base64.decode64(chunk)
+          end
+        end
+      end
+
+      def self.variants
+        [[['b64','base64'], {}]]
+      end
+
+      def self.params 
+        [:input]
+      end
+    end
+ 
+
+    class Bitwise < Function
+      def apply
+        input,keyinput = @args
+        key = keyinput.read
+        Proc.new do
+          inchunk = input.read(key.size)
+          if inchunk
+            a,b=[inchunk,key].sort{|s|s.size}
+            a.bytes.each_with_index.map{|c,i|c.send(@options[:op], b.bytes.to_a[i%b.size])}.pack("c*")
+          else
+            nil
+          end
+        end
+      end
+
+      def self.variants
+        [
+          ['and', {:op=>:&}],
+          ['or', {:op=>:|}],
+          [['xor'], {:op=>:'^'}]
+        ]
+      end
+
+      def self.params
+        [:input, :input]
+      end
+    end
+
     OPENSSL_DIGESTS = %w(md2 md4 md5 sha sha1 sha224 sha256 sha384 sha512)
 
     class OpenSslDigest < Function
@@ -130,154 +307,7 @@ module Ciphr
       end
     end
 
-    class Base < InvertibleFunction
-
-    end
-
-    class Base64 < Base
-      def apply    
-        input = @args[0]
-        if !invert
-          Proc.new do
-            chunk = input.read(3)
-            chunk && ::Base64.encode64(chunk).gsub(/\s/,'')
-          end
-        else
-          Proc.new do
-            chunk = input.read(4)
-            chunk = chunk && chunk + "="*(4-chunk.size) #pad
-            chunk && ::Base64.decode64(chunk)
-          end
-        end
-      end
-
-      def self.variants
-        [[['b64','base64'], {}]]
-      end
-
-      def self.params 
-        [:input]
-      end
-    end
-
-    class Base16 < Base
-      def self.variants
-        [[['hex','hexidecimal','b16','base16'], {}]]
-      end
-
-      def self.params
-        [:input]
-      end
-
-      def apply
-        input = @args[0]
-        if !invert              
-          Proc.new do
-            chunk = input.read(1)
-            chunk && chunk.unpack("H*")[0]
-          end
-        else
-          Proc.new do
-            chunk = input.read(2)
-            chunk && [chunk].pack("H*")
-          end
-        end
-      end
-    end
-
-#WARN about buffering all input
-    class Base10 < Base
-      def self.variants
-        [[['dec','decimal','b10','base10'], {}]]
-      end
-
-      def self.params
-        [:input]
-      end
-
-      def apply
-        input = @args[0]
-        if !invert     
-          num = 0      
-          while chunk = input.read(1)
-            num = (num << 8) + chunk.bytes.to_a[0] || num.to_s(10)
-          end
-          Proc.new do
-            begin
-              num && num.to_s(10) || num
-            ensure
-              num = nil
-            end
-          end
-        else
-          num = input.read().to_i(10)
-          bytes = []
-          while num > 0
-            bytes.unshift(num & 0xff)
-            num = num >> 8
-          end
-          Proc.new do
-            begin
-              bytes && bytes.pack("c*") || bytes
-            ensure
-              bytes = nil
-            end
-          end
-        end
-      end
-    end
-
-    class Base8 < Base
-      def self.variants
-        [[['oct','octal','b8','base8'], {}]]
-      end
-
-      def self.params
-        [:input]
-      end
-
-      def apply
-        input = @args[0]
-        if !invert              
-          Proc.new do
-            chunk = input.read(3)
-            chunk = chunk && chunk + "\x00"*(3-chunk.size) #pad
-            chunk && chunk.unpack("B*")[0].bytes.to_a.each_slice(3).to_a.map{|a|a.pack("c*").to_i(2).to_s(8)}.join
-          end
-        else
-          Proc.new do
-            chunk = input.read(8)
-            chunk = chunk && chunk + "0"*(8-chunk.size) #pad
-            chunk && chunk.unpack("aaaaaaaa").map{|o| o.to_i.to_s(2).rjust(3,"0")}.join.unpack("a8a8a8").map{|b| b.to_i(2)}.pack("C*")
-          end
-        end
-      end
-    end   
-
-    class Base2 < Base
-      def self.variants
-        [[['bin','binary','b2','b2'], {}]]
-      end
-
-      def self.params
-        [:input]
-      end
-
-      def apply
-        input = @args[0]
-        if !invert              
-          Proc.new do
-            chunk = input.read(1)
-            chunk && chunk.unpack("B*")[0]
-          end
-        else
-          Proc.new do
-            chunk = input.read(8)
-            chunk && [chunk].pack("B*")
-          end
-        end
-      end
-    end    
+  
 
     class OpenSslCipher < InvertibleFunction
       def apply
@@ -311,34 +341,6 @@ module Ciphr
 
       def self.params 
         [:input, :key]
-      end
-    end
-
-    class Bitwise < Function
-      def apply
-        input,keyinput = @args
-        key = keyinput.read
-        Proc.new do
-          inchunk = input.read(key.size)
-          if inchunk
-            a,b=[inchunk,key].sort{|s|s.size}
-            a.bytes.each_with_index.map{|c,i|c.send(@options[:op], b.bytes.to_a[i%b.size])}.pack("c*")
-          else
-            nil
-          end
-        end
-      end
-
-      def self.variants
-        [
-          ['and', {:op=>:&}],
-          ['or', {:op=>:|}],
-          [['xor'], {:op=>:'^'}]
-        ]
-      end
-
-      def self.params
-        [:input, :input]
       end
     end
 
