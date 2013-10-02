@@ -25,6 +25,51 @@ bundle install
 rake install
 ```
 
+## Examples
+
+```shell
+$ ciphr '"abc"'
+abc
+$ ciphr '"abc"|hex'
+616263
+$ ciphr '"abc"|hex|~hex'
+abc
+$ ciphr '"616263"|~hex'
+abc
+$ ciphr '0x616263'
+abc
+$ ciphr '0x616263|hex'
+616263
+$ ciphr '0b10101010|bin'
+10101010
+$ ciphr '0b10101010|hex'
+aa
+$ ciphr '255|hex'
+ff
+$ ciphr '65'
+A
+$ ciphr '""|md5|hex'
+d41d8cd98f00b204e9800998ecf8427e
+$ echo -n "" | ciphr 'md5|hex'
+d41d8cd98f00b204e9800998ecf8427e
+$ ciphr '"abc"|sha1|hex'
+a9993e364706816aba3e25717850c26c9cd0d89d
+$ echo -n "abc" | ciphr 'sha1' | xxd -ps
+a9993e364706816aba3e25717850c26c9cd0d89d0a
+$ echo -n "abc" | ciphr 'xor("abc")|hex'
+000000
+$ echo -n "abc" | ciphr 'xor(0x01)|hex'
+606362
+$ echo -n "abc" | ciphr 'xor(0x01)'
+`cb
+$ echo -n "abc" | ciphr 'xor(0x020304)'
+cag
+$ echo -n "abc" | ciphr 'aes128cbc("super secret key")|hex'
+8ad54a1a16c4963a231beb69e0888a8f
+$ echo -n "abc" | ciphr 'aes128cbc("super secret key")|hex|~hex|~aes128cbc("super secret key")'
+abc
+```
+
 ## Usage
 
 ```shell
@@ -33,7 +78,7 @@ Usage: ciphr [options] [spec]
     -h, --help
     -v, --verbose
     -n, --no-newline
-Available Functions:
+Available Functions: aliases ([args])
 	cat, noop (input)
 	md2 (input)
 	md4 (input)
@@ -130,51 +175,6 @@ Available Functions:
 	seedecb (input, key)
 	seedofb (input, key)
 	blowfish (input, key)
-```
-
-## Examples
-
-```shell
-$ ciphr '"abc"'
-abc
-$ ciphr '"abc"|hex'
-616263
-$ ciphr '"abc"|hex|~hex'
-abc
-$ ciphr '"616263"|~hex'
-abc
-$ ciphr '0x616263'
-abc
-$ ciphr '0x616263|hex'
-616263
-$ ciphr '0b10101010|bin'
-10101010
-$ ciphr '0b10101010|hex'
-aa
-$ ciphr '255|hex'
-ff
-$ ciphr '65'
-A
-$ ciphr '""|md5|hex'
-d41d8cd98f00b204e9800998ecf8427e
-$ echo -n "" | ciphr 'md5|hex'
-d41d8cd98f00b204e9800998ecf8427e
-$ ciphr '"abc"|sha1|hex'
-a9993e364706816aba3e25717850c26c9cd0d89d
-$ echo -n "abc" | ciphr 'sha1' | xxd -ps
-a9993e364706816aba3e25717850c26c9cd0d89d0a
-$ echo -n "abc" | ciphr 'xor("abc")|hex'
-000000
-$ echo -n "abc" | ciphr 'xor(0x01)|hex'
-606362
-$ echo -n "abc" | ciphr 'xor(0x01)'
-`cb
-$ echo -n "abc" | ciphr 'xor(0x020304)'
-cag
-$ echo -n "abc" | ciphr 'aes128cbc("super secret key")|hex'
-8ad54a1a16c4963a231beb69e0888a8f
-$ echo -n "abc" | ciphr 'aes128cbc("super secret key")|hex|~hex|~aes128cbc("super secret key")'
-abc
 ```
 
 ## Developing

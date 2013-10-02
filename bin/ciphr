@@ -18,7 +18,7 @@ Slop.parse do
     	puts opts
     	
     	if opts[:verbose]
-	    	puts "Available Functions:"
+	    	puts "Available Functions: aliases ([args])"
 	    	Ciphr::Functions.functions.flat_map{|c,vs| vs.map{|v| [c,v] }}.each{|a|
 	    		c,v = a
 	    		puts "\t#{v[0].map{|v|v.to_s}.join(", ")} (#{c.params.map{|p| p.to_s}.join(", ")})"
