@@ -50,7 +50,7 @@ class Ciphr::Transformer < Parslet::Transform
 
 	def self.transform_operations(d)
 		operations = [d[:operations]].flatten
-		if operations[0].args.size < operations[0].params.size
+		if operations[0].args.size < operations[0].class.params.size
 			operations.unshift(Ciphr::Functions::StdInReader.new({},[]))
 		end
 		operations.inject{|m,f| f.args = [f.args||[]].flatten.unshift(m); f }

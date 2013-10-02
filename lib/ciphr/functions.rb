@@ -7,19 +7,27 @@ module Ciphr
     # http://stackoverflow.com/questions/746207/ruby-design-pattern-how-to-make-an-extensible-factory-class
 
   	@function_classes = []
-    @function_variants = {}
+    @functions = []
+    @function_aliases = {}
 
   	def self.register(klass)
       @function_classes << klass
   	end
 
-    def self.setup
-      class_variants = @function_classes.flat_map{|c| c.variants.map{|v| [c,v]}}
-      @function_variants = Hash[class_variants.flat_map{|c,v| [v[0]].flatten.map{|n| [n,[c, v[1]]]}}]
+    def self.setup(classes=@function_classes)
+      @functions = @function_classes.map{|c| [c,c.variants]}.select{|a| a[1] && a[1].size > 0}.map{|a| 
+                        [a[0], a[1].map{|v| [[v[0]].flatten, v[1]]}]
+                      }
+
+      @function_aliases = Hash[@functions.flat_map{|c,vs| vs.map{|v| [v[0]].flatten.map{|n| [n,[c, v[1]]]}}}]
     end
 
     def self.[](name)
-      @function_variants[name]
+      @function_aliases[name]
+    end
+
+    def self.functions
+      @functions
     end
 
     class Function
@@ -38,7 +46,7 @@ module Ciphr
   		  Ciphr::Functions.register(subclass)
     	end
 
-      def params
+      def self.params
         []
       end
 
@@ -54,10 +62,10 @@ module Ciphr
 
     class Cat < Function
       def self.variants
-        [['cat','noop'], {}]
+        [[['cat','noop'], {}]]
       end
 
-      def params
+      def self.params
         [:input]
       end
 
@@ -76,7 +84,7 @@ module Ciphr
         OPENSSL_DIGESTS.map{|d| [d, {:variant => d}]}
       end
 
-      def params
+      def self.params
         [:input]
       end
 
@@ -100,7 +108,7 @@ module Ciphr
         OPENSSL_DIGESTS.map{|d| ["hmac#{d}", {:variant => d}]}        
       end
 
-      def params 
+      def self.params 
         [:input, :key]
       end
 
@@ -145,7 +153,7 @@ module Ciphr
         [[['b64','base64'], {}]]
       end
 
-      def params 
+      def self.params 
         [:input]
       end
     end
@@ -155,8 +163,8 @@ module Ciphr
         [[['hex','hexidecimal','b16','base16'], {}]]
       end
 
-      def params
-        [:arguments]
+      def self.params
+        [:input]
       end
 
       def apply
@@ -181,8 +189,8 @@ module Ciphr
         [[['dec','decimal','b10','base10'], {}]]
       end
 
-      def params
-        [:arguments]
+      def self.params
+        [:input]
       end
 
       def apply
@@ -222,8 +230,8 @@ module Ciphr
         [[['oct','octal','b8','base8'], {}]]
       end
 
-      def params
-        [:arguments]
+      def self.params
+        [:input]
       end
 
       def apply
@@ -249,8 +257,8 @@ module Ciphr
         [[['bin','binary','b2','b2'], {}]]
       end
 
-      def params
-        [:arguments]
+      def self.params
+        [:input]
       end
 
       def apply
@@ -299,7 +307,7 @@ module Ciphr
         end
       end
 
-      def params 
+      def self.params 
         [:input, :key]
       end
     end
@@ -326,7 +334,7 @@ module Ciphr
         [['xor', {}]]
       end
 
-      def params
+      def self.params
         [:input, :input]
       end
     end
@@ -364,23 +372,11 @@ module Ciphr
 
 
     class StdInReader < Function
-      # def self.variants
-      #   [['stdin',{}]]
-      # end
-
       def apply
         Proc.new do
           $stdin.read(256)
         end
       end
     end
-
-
-    #need streaming-capible impl before this is viable
-    # class Regex < Function
-    #   def apply
-    #     Regex.new(options[:search])
-    #   end
-    # end
   end
 end
