@@ -7,19 +7,14 @@ robustness
 -----------
 * graceful handling of mismatched data size (key size, base64 chunks, xor)
 * errors for bad function name or args
-* shell friendly alternate delimiters
-* optional spaces in grammar
-* CLI options
-* help with function list
 * case insensitivity for ~b16
-* high level classification of functions
-stdout
+* high level classification of functions (util, bitwise, hash, cipher, mac, etc)
 
 completeness
 -----------
 base64 variants
 * %/url, b32, ascii85, escape-sequence (\x, String.dump), xml/html, unicode encoding, other stuff in ruby's Encoding class
-* xor (variants for mismatched lengths?)
+* bitwise ops: variants for mismatched lengths?
 
 
 features
