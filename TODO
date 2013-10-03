@@ -2,6 +2,7 @@ TODO:
 ==========================
 fix
 -----------
+zero/default IV for ciphers; should be random
 
 robustness
 -----------
