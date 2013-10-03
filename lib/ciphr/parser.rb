@@ -8,7 +8,7 @@ class Ciphr::Parser < Parslet::Parser
 	rule(:spaces)      { match('\s').repeat(1) }
 	rule(:spaces?)     { spaces.maybe }
 
-	rule(:name) { (match('[a-z]') >> match('[a-z0-9]').repeat).as(:name) }	
+	rule(:name) { (match('[a-z]') >> match('[a-z0-9\-_]').repeat).as(:name) }	
 	rule(:literal) { b2 | b8 | b10 | b16 | b64 | string | file }
 	rule(:file) { str('@') >> (	string | match('[^ ()\[\]{},|]' ).repeat ).as(:file) }
 	rule(:string) { str('"') >> ( str('\\') >> any | str('"').absent? >> any ).repeat.maybe.as(:string) >> str('"') }
