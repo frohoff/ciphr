@@ -10,6 +10,7 @@ robustness
 * errors for bad function name or args
 * case insensitivity for ~b16
 * high level classification of functions (util, bitwise, hash, cipher, mac, etc)
+* handling of optional arguments (IVs/nonces, # rounds, etc) without breaking pipe argument prepending
 
 completeness
 -----------
