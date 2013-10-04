@@ -36,10 +36,12 @@ functions
     reverse bits/nibbles/bytes	
     repeat bytes
   compression
-    gzip/deflate
+    gzip/deflate/lz*/bzip2/snappy/rle
+      http://en.wikipedia.org/wiki/Lempel%E2%80%93Ziv
   generators
     random bytes
 
+namespacing in case of simple name collisions
 string literals
   alternative quotes (a la ruby/perl/python, %q[] %Q{} qq() """ ''') http://en.wikibooks.org/wiki/Ruby_Programming/Alternate_quotes
   allow \xXX escaping
