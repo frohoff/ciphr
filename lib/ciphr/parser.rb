@@ -15,7 +15,7 @@ class Ciphr::Parser < Parslet::Parser
 	rule(:b2) { str('0b') >> match('[0-1]').repeat(1).as(:b2) }
 	rule(:b8) { ( match('0').repeat(1) >> match('o').maybe >> match('[0-7]').repeat(1).as(:b8) ) }
 	rule(:b10) { ( match('[1-9]') >> match('[0-9]').repeat ).as(:b10) }
-	rule(:b16) { str('0x') >> match('[0-9a-f]').repeat(1).as(:b16) }
+	rule(:b16) { str('0x') >> match('[0-9a-fA-F]').repeat(1).as(:b16) }
 	#b32
 	rule(:b64) { str('=') >> match('[0-9a-zA-Z+/=]').repeat(1).as(:b64) }
 	#might want to make sure brace types match
