@@ -39,8 +39,10 @@ functions
   generators
     random bytes
 
+string literals
+  alternative quotes (a la ruby/perl/python, %q[] %Q{} qq() """ ''') http://en.wikibooks.org/wiki/Ruby_Programming/Alternate_quotes
+  allow \xXX escaping
 extension mechanism (via other gems or simple files)
-allow \x escaping in string literals
 non pipe statements
 variable writing/reading
 
