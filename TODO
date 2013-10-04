@@ -22,7 +22,7 @@ features
 ---------------
 functions
   bitwise ops
-    shift right/left (full rotate vs fill)
+    shift right/left (circular rotate vs fill)
     not/and/or (similar to xor)
   hashes  
     crc/adler
@@ -33,10 +33,11 @@ functions
     prepend/append
     indexed head/tail/substring
     reverse bits/nibbles/bytes	
-  base
-    decimal
+    repeat bytes
   compression
     gzip/deflate
+  generators
+    random bytes
 
 extension mechanism (via other gems or simple files)
 allow \x escaping in string literals
