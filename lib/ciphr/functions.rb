@@ -228,7 +228,7 @@ module Ciphr
     end
  
 
-    class Bitwise < Function
+    class BinaryBitwise < Function
       def apply
         input,keyinput = @args
         key = keyinput.read
@@ -255,6 +255,29 @@ module Ciphr
         [:input, :input]
       end
     end
+
+    class UnaryBitwise < Function
+      def apply
+        input = @args[0]
+        Proc.new do
+          inchunk = input.read(1)
+          if inchunk
+            inchunk.bytes.map{|b| b = ~b }.pack("c*")
+          else
+            nil
+          end
+        end
+      end
+
+      def self.variants
+        [ ['not', {}] ]
+      end
+
+      def self.params
+        [:input]
+      end
+    end
+
 
     OPENSSL_DIGESTS = %w(md2 md4 md5 sha sha1 sha224 sha256 sha384 sha512)
 

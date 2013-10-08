@@ -10,6 +10,7 @@ robustness
 * errors for bad function name or args
 * case insensitivity for ~b16
 * high level classification of functions (util, bitwise, hash, cipher, mac, etc)
+* handling of optional arguments (IVs/nonces, # rounds, etc) without breaking pipe argument prepending
 
 completeness
 -----------
@@ -22,7 +23,7 @@ features
 ---------------
 functions
   bitwise ops
-    shift right/left (full rotate vs fill)
+    shift right/left (circular rotate vs fill)
     not/and/or (similar to xor)
   hashes  
     crc/adler
@@ -33,13 +34,23 @@ functions
     prepend/append
     indexed head/tail/substring
     reverse bits/nibbles/bytes	
-  base
-    decimal
+    repeat bytes
   compression
-    gzip/deflate
+    gzip/deflate/lz*/bzip2/snappy/rle
+      http://en.wikipedia.org/wiki/Lempel%E2%80%93Ziv
+  generators
+    random bytes
 
+revamp streams
+  https://github.com/javanthropus/io-like
+  https://github.com/javanthropus/stream
+  https://github.com/rubygems/rubygems/blob/master/lib/rubygems/package/digest_io.rb
+  https://www.ruby-forum.com/topic/58563
+namespacing in case of simple name collisions
+string literals
+  alternative quotes (a la ruby/perl/python, %q[] %Q{} qq() """ ''') http://en.wikibooks.org/wiki/Ruby_Programming/Alternate_quotes
+  allow \xXX escaping
 extension mechanism (via other gems or simple files)
-allow \x escaping in string literals
 non pipe statements
 variable writing/reading
 
