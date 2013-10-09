@@ -15,7 +15,7 @@ module Ciphr
   	end
 
     def self.setup(classes=@function_classes)
-      @functions = @function_classes.map{|c| [c,c.variants]}.select{|a| a[1] && a[1].size > 0}.map{|a| 
+      @functions = classes.map{|c| [c,c.variants]}.select{|a| a[1] && a[1].size > 0}.map{|a| 
                         [a[0], a[1].map{|v| [[v[0]].flatten.uniq, v[1]]}]}
       @function_aliases = Hash[@functions.map{|c,vs| vs.map{|v| [v[0]].flatten.map{|n| [n,[c, v[1]]]}}.flatten(1)}.flatten(1)]
     end
