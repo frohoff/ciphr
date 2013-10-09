@@ -73,6 +73,40 @@ break up functions
 scratch notes
 ==========================
 
+$ ruby -e 'puts ["c","s"].product(["i","y"]).product(["ph","f"]).product(["r","er","yr","ir"]).map{|a| a.flatten.join}'
+ciphr
+cipher
+ciphyr
+ciphir
+cifr
+cifer
+cifyr
+cifir
+cyphr
+cypher
+cyphyr
+cyphir
+cyfr
+cyfer
+cyfyr
+cyfir
+siphr
+sipher
+siphyr
+siphir
+sifr
+sifer
+sifyr
+sifir
+syphr
+sypher
+syphyr
+syphir
+syfr
+syfer
+syfyr
+syfir
+
 
 11111111 | 11111111 | 11111111
 111 | 111 | 111 | 111 | 111 | 111 | 111 | 111 
