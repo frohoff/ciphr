@@ -42,6 +42,7 @@ functions
     random bytes
 
 revamp streams
+  http://readruby.io/io
   https://github.com/javanthropus/io-like
   https://github.com/javanthropus/stream
   https://github.com/rubygems/rubygems/blob/master/lib/rubygems/package/digest_io.rb
