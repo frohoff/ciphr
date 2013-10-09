@@ -235,7 +235,7 @@ module Ciphr
         Proc.new do
           inchunk = input.read(key.size)
           if inchunk
-            a,b=[inchunk,key].sort{|s|s.size}
+            a,b=[inchunk,key]
             a.bytes.each_with_index.map{|c,i|c.send(@options[:op], b.bytes.to_a[i%b.size])}.pack("c*")
           else
             nil
