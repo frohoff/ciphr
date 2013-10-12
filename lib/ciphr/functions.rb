@@ -1,5 +1,6 @@
 require 'openssl'
 require 'base64'
+require 'cgi'
 
 module Ciphr
   module Functions
@@ -227,6 +228,37 @@ module Ciphr
       end
     end
  
+    class UrlEncoding < InvertibleFunction
+      def apply
+        input = @args[0]
+        if !invert
+          Proc.new do
+            chunk = input.read(1)
+            chunk && CGI.escape(chunk)
+          end
+        else
+          Proc.new do
+            chunk = input.read(1)
+            if (chunk == "%")
+              chunk += input.read(2)
+              chunk && CGI.unescape(chunk)
+            else
+              chunk
+            end
+          end
+        end
+      end
+
+      def self.variants
+        [
+          [['url','uri'],{}]
+        ]
+      end
+
+      def self.params 
+        [:input]
+      end      
+    end
 
     class BinaryBitwise < Function
       def apply
