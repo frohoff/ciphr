@@ -6,13 +6,13 @@ module Ciphr
 
     # http://stackoverflow.com/questions/746207/ruby-design-pattern-how-to-make-an-extensible-factory-class
 
-  	@function_classes = []
+    @function_classes = []
     @functions = []
     @function_aliases = {}
 
-  	def self.register(klass)
+    def self.register(klass)
       @function_classes << klass
-  	end
+    end
 
     def self.setup(classes=@function_classes)
       @functions = classes.map{|c| [c,c.variants]}.select{|a| a[1] && a[1].size > 0}.map{|a| 
@@ -33,20 +33,20 @@ module Ciphr
     end
 
     class Function
-    	def initialize(options, args)
-    		@options = options
+      def initialize(options, args)
+        @options = options
         @args = args
         @stream = Ciphr::Stream.new(self)
-    	end
+      end
       attr_accessor :options, :args #don't like that these are both writable, but c'est la vie
 
       def self.variants
         []
       end
 
-    	def self.inherited(subclass)
-  		  Ciphr::Functions.register(subclass)
-    	end
+      def self.inherited(subclass)
+        Ciphr::Functions.register(subclass)
+      end
 
       def self.params
         []

@@ -2,10 +2,10 @@ require 'ciphr'
 
 describe Ciphr::Stream do
   describe :read do
-  	it "returns nil after proc does" do
+    it "returns nil after proc does" do
       s = Ciphr::Stream.new Proc.new { nil }
       s.read(1).should be == nil
-  	end
+    end
 
     it "buffers and returns data as requested" do
       fills = ["abc", "def", "ghi"]
@@ -18,8 +18,8 @@ describe Ciphr::Stream do
       s.read(1).should be == nil
     end
 
-  	it "" do
+    it "" do
 
-  	end
+    end
   end
 end

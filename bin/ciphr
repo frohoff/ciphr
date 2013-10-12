@@ -15,24 +15,24 @@ Slop.parse do
 
     Ciphr::Functions.setup
     if opts[:help]
-    	puts opts
-    	
-    	if opts[:verbose]
-	    	puts "Available Functions: aliases ([args])"
-	    	Ciphr::Functions.functions.flat_map{|c,vs| vs.map{|v| [c,v] }}.each{|a|
-	    		c,v = a
-	    		puts "\t#{v[0].map{|v|v.to_s}.join(", ")} (#{c.params.map{|p| p.to_s}.join(", ")})"
-	    	}
-    	end
+        puts opts
+        
+        if opts[:verbose]
+            puts "Available Functions: aliases ([args])"
+            Ciphr::Functions.functions.flat_map{|c,vs| vs.map{|v| [c,v] }}.each{|a|
+                c,v = a
+                puts "\t#{v[0].map{|v|v.to_s}.join(", ")} (#{c.params.map{|p| p.to_s}.join(", ")})"
+            }
+        end
     else
-		spec = args.join(" ")
-		parsed = Ciphr::Parser.new.parse(spec)
-		transformed = Ciphr::Transformer.new.apply(parsed)
+        spec = args.join(" ")
+        parsed = Ciphr::Parser.new.parse(spec)
+        transformed = Ciphr::Transformer.new.apply(parsed)
 
-		while chunk = transformed.read(256)
-			print chunk
-		end
-		puts if !opts[:'no-newline']
+        while chunk = transformed.read(256)
+            print chunk
+        end
+        puts if !opts[:'no-newline']
     end
   end
 end
