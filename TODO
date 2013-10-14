@@ -11,6 +11,8 @@ robustness
 * case insensitivity for ~b16
 * high level classification of functions (util, bitwise, hash, cipher, mac, etc)
 * handling of optional arguments (IVs/nonces, # rounds, etc) without breaking pipe argument prepending
+* escape/encode non-printable chars if outputting to tty http://blog.bogojoker.com/2009/04/check-if-your-ruby-script-is-in-a-pipe/
+* description for functions in help
 
 completeness
 -----------
@@ -69,6 +71,18 @@ cleanliness
 refactor variable buffering (probably will improve perf)
 break up functions
 
+goals and philosophy
+==========================
+functions on streams of bytes
+kiss: crypto, hashes, bitwise ops, encodings, compression, simple transforms
+most complex use case: generate rails cookie from marshalled data and secret
+strive for streaming impls and low memory usage even for large input documents
+pull/read (vs push/write) based API
+shell friendly syntax
+maximum portability, no native gem deps
+extensible via external gems adding functions
+
+
 
 scratch notes
 ==========================
@@ -106,6 +120,23 @@ syfr
 syfer
 syfyr
 syfir
+
+
+
+
+Gem::Specification.find_all.to_a.select{|s| s.dependencies.any?{|d| d.name=='slop'}}.map{|s| s.name}
+https://codeclimate.com/github/cloudfoundry/vmc/VMC::Plugin/source_listing.js?line_end=53&line_start=11&path=lib%2Fvmc%2Fplugin.rb
+https://github.com/mmozuras/pronto
+http://stackoverflow.com/questions/11827950/create-an-extensible-ruby-gem
+https://bitbucket.org/ged/strelka/src/dc4b6998813161ab4c94656ce144aa36a85ab65e/lib/strelka/discovery.rb
+
+
+
+
+http://weblog.rubyonrails.org/2009/9/1/gem-packaging-best-practices/
+https://gist.github.com/rtomayko/54177
+
+
 
 
 11111111 | 11111111 | 11111111
