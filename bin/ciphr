@@ -14,7 +14,7 @@ Slop.parse do
   run do |opts, args|
 
     Ciphr::Functions.setup
-    if opts[:help]
+    if opts[:help] || args.size == 0
         puts opts
         
         if opts[:verbose]
