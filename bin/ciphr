@@ -25,14 +25,20 @@ Slop.parse do
             }
         end
     else
-        spec = args.join(" ")
+      spec = args.join(" ")
+      begin
         parsed = Ciphr::Parser.new.parse(spec)
         transformed = Ciphr::Transformer.new.apply(parsed)
-
+     
         while chunk = transformed.read(256)
-            print chunk
+          print chunk
         end
         puts if !opts[:'no-newline']
+      rescue Parslet::ParseFailed => e
+        $stderr.puts e.cause
+        $stderr.puts spec
+        $stderr.puts " "*(e.cause.pos-1) + "^"
+      end
     end
   end
 end
