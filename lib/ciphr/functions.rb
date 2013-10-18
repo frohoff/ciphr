@@ -370,20 +370,31 @@ module Ciphr
         cipher = OpenSSL::Cipher.new(@options[:variant])
         cipher.send(invert ? :decrypt : :encrypt)
         cipher.key = key.read
+        random_iv = cipher.random_iv
+        block_size = random_iv.size
+        cipher.iv = invert ? input.read(block_size) : random_iv
         Proc.new do
-          chunk = input.read(256)
-          if cipher
-            if chunk
-              cipher.update(chunk)
-            else
-              begin
-                cipher.final
-              ensure
-                cipher = nil
-              end
+          if ! invert && random_iv
+            begin
+              random_iv
+            ensure
+              random_iv = nil
             end
           else
-            nil
+            chunk = input.read(256)
+            if cipher
+              if chunk
+                cipher.update(chunk)
+              else
+                begin
+                  cipher.final
+                ensure
+                  cipher = nil
+                end
+              end
+            else
+              nil
+            end
           end
         end
       end
