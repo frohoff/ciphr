@@ -26,7 +26,7 @@ module Ciphr
     end
 
     def self.[](name)
-      @function_aliases[name]
+      @function_aliases[name] || (raise InvalidFunctionError.new(name))
     end
 
     def self.functions
@@ -208,19 +208,25 @@ module Ciphr
         if !invert
           Proc.new do
             chunk = input.read(3)
-            chunk && ::Base64.encode64(chunk).gsub(/\s/,'')
+            chunk && ::Base64.encode64(chunk).gsub(/\s/,'').tr("+/", options[:chars][0,2]).tr("=", options[:chars][2,3])
           end
         else
           Proc.new do
             chunk = input.read(4)
             chunk = chunk && chunk + "="*(4-chunk.size) #pad
-            chunk && ::Base64.decode64(chunk)
+            chunk && ::Base64.decode64(chunk.tr(options[:chars][0,2],"+/").tr(options[:chars][2,3],"=").ljust(4,"="))
           end
         end
       end
 
       def self.variants
-        [[['b64','base64'], {}]]
+        chars = {"+"=>"p", "-"=>"h", "_"=>"u", ":"=>"c", "/"=>"s", "." => "d", "!"=>"x", "="=>"q"}
+        types = {"+/=" => ["std"], "+/" => "utf7", "+-" => "file", "-_" => "url", "._-" => "yui", 
+                 ".-" => "xml-name", "_:" => "xml-id", "_-" => "prog-id-1", "._" => "prog-id-2", "!-" => "regex"}
+        variants = types.map{|c,n| [["b64","base64"].product([c.chars.map{|c| chars[c] }.join,n]).map{|a| a.join("-")}, {:chars => c}]}
+        std = variants.select{|v| v[0].include? "b64-std"}[0] #add short aliases for standard
+        std[0] = ["b64","base64"].concat(std[0])
+        variants
       end
 
       def self.params 
@@ -435,6 +441,13 @@ module Ciphr
         Proc.new do
           $stdin.read(256)
         end
+      end
+    end
+    
+    class InvalidFunctionError < StandardError
+      attr_reader :name
+      def initialize(name)
+        @name = name
       end
     end
   end

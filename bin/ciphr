@@ -37,7 +37,9 @@ Slop.parse do
       rescue Parslet::ParseFailed => e
         $stderr.puts e.cause
         $stderr.puts spec
-        $stderr.puts " "*(e.cause.pos-1) + "^"
+        $stderr.puts " "*(e.cause.pos) + "^"
+      rescue Ciphr::Functions::InvalidFunctionError => e
+        $stderr.puts "invalid function '#{e.name}'"
       end
     end
   end
