@@ -48,6 +48,7 @@ revamp streams
   https://github.com/javanthropus/io-like
   https://github.com/javanthropus/stream
   https://github.com/rubygems/rubygems/blob/master/lib/rubygems/package/digest_io.rb
+  https://gist.github.com/tlrobinson/967710
   https://www.ruby-forum.com/topic/58563
 namespacing in case of simple name collisions
 string literals
