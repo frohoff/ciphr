@@ -222,3 +222,74 @@ x(a)|y(b)|z(c)
 
 	a
 
+
+
+
+
+
+         file
+           |
+           V
+         ~hex
+           |
+           V
+stdin --> aes --> hex --> stdout
+
+
+         file1   file2
+           |       |
+           V       V
+         ~hex    ~hex
+           |       |
+           V       V
+stdin --> aes --> aes -> hex --> stdout
+
+
+stdin --> md5 --> hex --> stdout
+
+
+stdin --> md5 --> md5 --> ... -> md5 --> hex --> stdout
+
+
+
+
+base64: read multiple loop
+  input.read(4) {|bytes,eof|
+    output.write(encode(bytes))
+  }
+
+cipher: read full init, read arbitrary loop, special end
+  key.read() {|bytes,eof|
+    @bytes = bytes
+  }
+  input.read(256) {|bytes,eof|
+    output.write(cipher.update)
+  }
+
+xor-repeat: read full init, read arbitrary loop
+  key.read() {|bytes,eof|}
+
+
+xor-trunc: read arbitrary loop
+  key.read(1) && input.read(1) {
+
+  }
+
+
+md5: read arbitrary loop, special end
+
+hmac: read full init, read arbitrary loop, special end
+
+def pump
+  if input.size >= 1 && key.size >= 1
+    output.write(input.read(1) ^ key.read(1))
+  end
+end
+
+
+
+IDEAS:
+
+method_missing for arguments in function body
+  
+
