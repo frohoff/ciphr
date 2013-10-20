@@ -1,6 +1,9 @@
 require 'openssl'
 require 'base64'
 require 'cgi'
+require 'base32'
+require 'base32/crockford'
+require 'zbase32'
 
 module Ciphr
   module Functions
@@ -197,6 +200,37 @@ module Ciphr
           Proc.new do
             chunk = input.read(2)
             chunk && [chunk].pack("H*")
+          end
+        end
+      end
+    end
+
+
+    class Base32 < Base
+      def self.variants
+        [
+          [['b32','base32','b32-std','base32-std'], {:object => ::Base32 }]#, 
+          #broken
+          #[['b32-crockford','base32-crockford'], {:object => ::Base32::Crockford }],
+          #[['b32-z','base32-z'], {:object => ZBase32.new }]
+        ]
+      end
+
+      def self.params
+        [:input]
+      end
+
+      def apply
+        input = @args[0]
+        if !invert              
+          Proc.new do
+            chunk = input.read(5)
+            chunk && options[:object].encode(chunk)
+          end
+        else
+          Proc.new do
+            chunk = input.read(8)
+            chunk && options[:object].decode(chunk)
           end
         end
       end
