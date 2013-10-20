@@ -2,8 +2,8 @@ require 'openssl'
 require 'base64'
 require 'cgi'
 require 'base32'
-require 'base32/crockford'
-require 'zbase32'
+#require 'base32/crockford'
+#require 'zbase32'
 
 module Ciphr
   module Functions
@@ -488,6 +488,15 @@ module Ciphr
         end
       end
     end
+
+    class IoReader < Function
+      def apply
+        input = args[0]
+        Proc.new do
+          input.read(256)
+        end
+      end
+    end    
     
     class InvalidFunctionError < StandardError
       attr_reader :name

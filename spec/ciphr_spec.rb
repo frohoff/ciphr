@@ -1,0 +1,15 @@
+require 'ciphr'
+
+describe Ciphr do
+  describe :transform do
+    it "works for some simple test cases" do
+        Ciphr.transform("md5 hex","").should be == "d41d8cd98f00b204e9800998ecf8427e"
+        Ciphr.transform("b64 ~b64","foobar").should be == "foobar"
+        Ciphr.transform("b2 b16 ~b16 ~b2","foobar").should be == "foobar"
+        Ciphr.transform('"foobar"',"").should be == "foobar"
+        Ciphr.transform('0x41',"").should be == "A"
+        Ciphr.transform('0b01000001',"").should be == "A"
+        Ciphr.transform('0x43 xor[0x01]',"").should be == "B"
+    end
+  end
+end

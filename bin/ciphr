@@ -28,10 +28,10 @@ Slop.parse do
       spec = args.join(" ")
       begin
         parsed = Ciphr::Parser.new.parse(spec)
-        transformed = Ciphr::Transformer.new.apply(parsed)
+        transformed = Ciphr::Transformer.new($stdin).apply(parsed)
      
         while chunk = transformed.read(256)
-          print chunk
+          $stdout.print chunk
         end
         puts if !opts[:'no-newline']
       rescue Parslet::ParseFailed => e

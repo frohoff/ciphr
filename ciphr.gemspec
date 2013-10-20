@@ -24,6 +24,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "pry"
   spec.add_dependency "parslet"
   spec.add_dependency "base32"
-  spec.add_dependency "base32-crockford"
-  spec.add_dependency "zbase32"
+  #spec.add_dependency "base32-crockford"
+  #spec.add_dependency "zbase32"
 end

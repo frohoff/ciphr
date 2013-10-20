@@ -4,9 +4,10 @@ TODO:
 Context objects, Classes method_missing delegate to singleton instance
 
 
+
 fix
 -----------
-zero/default IV for ciphers; should be random
+bug in b64 decoding of HFF= => HFE=
 
 robustness
 -----------
@@ -21,7 +22,7 @@ robustness
 completeness
 -----------
 base64 variants
-* %/url, b32, ascii85, escape-sequence (\x, String.dump), xml/html, unicode encoding, other stuff in ruby's Encoding class
+* %/url, b32, ascii85, escape-sequence (\x, String.dump), xml/html
 * bitwise ops: variants for mismatched lengths?
 
 
