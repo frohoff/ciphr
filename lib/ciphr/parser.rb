@@ -41,7 +41,7 @@ class Ciphr::Transformer < Parslet::Transform
         rule(:b10 => simple(:v)) {|d| Ciphr::Functions::Base10.new({}, [Ciphr::Functions::StringReader.new({:string => d[:v].to_s},[])]).tap{|f| f.invert = true} }
         rule(:b16 => simple(:v)) {|d| Ciphr::Functions::Base16.new({}, [Ciphr::Functions::StringReader.new({:string => lpad(d[:v].to_s,2,"0")},[])]).tap{|f| f.invert = true} }
         #b32
-        rule(:b64 => simple(:v)) {|d| Ciphr::Functions::Base64.new({}, [Ciphr::Functions::StringReader.new({:string => d[:v]},[])]).tap{|f| f.invert = true} }
+        rule(:b64 => simple(:v)) {|d| Ciphr::Functions::Base64.new({:chars => "+/="}, [Ciphr::Functions::StringReader.new({:string => d[:v]},[])]).tap{|f| f.invert = true} }
         rule(:arguments => sequence(:arguments), :invert => simple(:invert), :name => simple(:name)) {|d| transform_call(d) }
         rule(:arguments => simple(:arguments), :invert => simple(:invert), :name => simple(:name)) {|d| transform_call(d) }
         rule(:invert => simple(:invert), :name => simple(:name)) {|d| transform_call(d) }
