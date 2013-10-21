@@ -55,8 +55,8 @@ string literals
   alternative quotes (a la ruby/perl/python, %q[] %Q{} qq() """ ''') http://en.wikibooks.org/wiki/Ruby_Programming/Alternate_quotes
   allow \xXX escaping
 extension mechanism (via other gems or simple files)
-non pipe statements
-variable writing/reading
+varargs for functions
+non pipe statements variable writing/reading
 
 
 random ideas
@@ -88,7 +88,11 @@ extensible via external gems adding functions
 scratch notes
 ==========================
 
-$ ruby -e 'puts ["c","s"].product(["i","y"]).product(["ph","f"]).product(["r","er","yr","ir"]).map{|a| a.flatten.join}'
+
+reverse(input,chunksize=1,boundarysize=nil)
+cat(input1,input2,...,inputn)
+
+ruby -e 'puts ["c","s"].product(["i","y"]).product(["ph","f"]).product(["r","er","yr","ir"]).map{|a| a.flatten.join}'
 ciphr
 cipher
 ciphyr
