@@ -7,6 +7,7 @@ describe Ciphr do
         Ciphr.transform("b64 ~b64","foobar").should be == "foobar"
         Ciphr.transform("b2 b16 ~b16 ~b2","foobar").should be == "foobar"
         Ciphr.transform('"foobar"',"").should be == "foobar"
+        Ciphr.transform('=ABBB b64',"").should be == "ABBB"        
         Ciphr.transform('0x41',"").should be == "A"
         Ciphr.transform('0b01000001',"").should be == "A"
         Ciphr.transform('0x43 xor[0x01]',"").should be == "B"
