@@ -21,23 +21,25 @@ Slop.parse do
             puts "Available Functions: aliases ([args])"
             Ciphr::Functions.functions.flat_map{|c,vs| vs.map{|v| [c,v] }}.each{|a|
                 c,v = a
-                puts "\t#{v[0].map{|v|v.to_s}.join(", ")} (#{c.params.map{|p| p.to_s}.join(", ")})"
+                puts "  #{v[0].map{|v|v.to_s}.join(", ")} (#{c.params.map{|p| p.to_s}.join(", ")})"
             }
         end
     else
       spec = args.join(" ")
       begin
         parsed = Ciphr::Parser.new.parse(spec)
-        transformed = Ciphr::Transformer.new.apply(parsed)
+        transformed = Ciphr::Transformer.new($stdin).apply(parsed)
      
         while chunk = transformed.read(256)
-          print chunk
+          $stdout.print chunk
         end
         puts if !opts[:'no-newline']
       rescue Parslet::ParseFailed => e
         $stderr.puts e.cause
         $stderr.puts spec
-        $stderr.puts " "*(e.cause.pos-1) + "^"
+        $stderr.puts " "*(e.cause.pos) + "^"
+      rescue Ciphr::Functions::InvalidFunctionError => e
+        $stderr.puts "invalid function '#{e.name}'"
       end
     end
   end

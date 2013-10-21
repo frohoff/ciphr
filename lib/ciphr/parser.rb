@@ -26,37 +26,42 @@ class Ciphr::Parser < Parslet::Parser
 end
 
 class Ciphr::Transformer < Parslet::Transform
+    def initialize(input)
+        super()
+        @input = input
 
-    rule(:name => simple(:v)) { v } 
-    rule(:file => simple(:v)) {|d| Ciphr::Functions::FileReader.new({:file => d[:v].to_s}, [])}
-    #eagerly eval these?
-    #trim to nearest byte vs chunk?
-    rule(:string => simple(:v)) {|d| Ciphr::Functions::StringReader.new({:string => d[:v]},[]) }
-    rule(:b2 => simple(:v)) {|d| Ciphr::Functions::Base2.new({}, [Ciphr::Functions::StringReader.new({:string => lpad(d[:v].to_s,8,"0")},[])]).tap{|f| f.invert = true} }
-    rule(:b8 => simple(:v)) {|d| Ciphr::Functions::Base8.new({}, [Ciphr::Functions::StringReader.new({:string => lpad(d[:v].to_s,8,"0")},[])]).tap{|f| f.invert = true} }
-    rule(:b10 => simple(:v)) {|d| Ciphr::Functions::Base10.new({}, [Ciphr::Functions::StringReader.new({:string => d[:v].to_s},[])]).tap{|f| f.invert = true} }
-    rule(:b16 => simple(:v)) {|d| Ciphr::Functions::Base16.new({}, [Ciphr::Functions::StringReader.new({:string => lpad(d[:v].to_s,2,"0")},[])]).tap{|f| f.invert = true} }
-    #b32
-    rule(:b64 => simple(:v)) {|d| Ciphr::Functions::Base64.new({}, [Ciphr::Functions::StringReader.new({:string => d[:v]},[])]).tap{|f| f.invert = true} }
-    rule(:arguments => sequence(:arguments), :invert => simple(:invert), :name => simple(:name)) {|d| transform_call(d) }
-    rule(:arguments => simple(:arguments), :invert => simple(:invert), :name => simple(:name)) {|d| transform_call(d) }
-    rule(:invert => simple(:invert), :name => simple(:name)) {|d| transform_call(d) }
-    rule(:operations => simple(:operations)) {|d| transform_operations(d)}
-    rule(:operations => sequence(:operations)) {|d| transform_operations(d)}    
+        #in ctor to provide instance scope to rule blocks
+        rule(:name => simple(:v)) { v } 
+        rule(:file => simple(:v)) {|d| Ciphr::Functions::FileReader.new({:file => d[:v].to_s}, [])}
+        #eagerly eval these?
+        #trim to nearest byte vs chunk?
+        rule(:string => simple(:v)) {|d| Ciphr::Functions::StringReader.new({:string => d[:v]},[]) }
+        rule(:b2 => simple(:v)) {|d| Ciphr::Functions::Base2.new({}, [Ciphr::Functions::StringReader.new({:string => lpad(d[:v].to_s,8,"0")},[])]).tap{|f| f.invert = true} }
+        rule(:b8 => simple(:v)) {|d| Ciphr::Functions::Base8.new({}, [Ciphr::Functions::StringReader.new({:string => lpad(d[:v].to_s,8,"0")},[])]).tap{|f| f.invert = true} }
+        rule(:b10 => simple(:v)) {|d| Ciphr::Functions::Base10.new({}, [Ciphr::Functions::StringReader.new({:string => d[:v].to_s},[])]).tap{|f| f.invert = true} }
+        rule(:b16 => simple(:v)) {|d| Ciphr::Functions::Base16.new({}, [Ciphr::Functions::StringReader.new({:string => lpad(d[:v].to_s,2,"0")},[])]).tap{|f| f.invert = true} }
+        #b32
+        rule(:b64 => simple(:v)) {|d| Ciphr::Functions::Base64.new({:chars => "+/="}, [Ciphr::Functions::StringReader.new({:string => d[:v]},[])]).tap{|f| f.invert = true} }
+        rule(:arguments => sequence(:arguments), :invert => simple(:invert), :name => simple(:name)) {|d| transform_call(d) }
+        rule(:arguments => simple(:arguments), :invert => simple(:invert), :name => simple(:name)) {|d| transform_call(d) }
+        rule(:invert => simple(:invert), :name => simple(:name)) {|d| transform_call(d) }
+        rule(:operations => simple(:operations)) {|d| transform_operations(d)}
+        rule(:operations => sequence(:operations)) {|d| transform_operations(d)}    
+    end
 
-    def self.lpad(s,n,p)
+    def lpad(s,n,p)
         s.size % n == 0 ? s : p * (n - s.size % n) + s
     end
 
-    def self.transform_operations(d)
+    def transform_operations(d)
         operations = [d[:operations]].flatten
         if operations[0].args.size < operations[0].class.params.size
-            operations.unshift(Ciphr::Functions::StdInReader.new({},[]))
+            operations.unshift(Ciphr::Functions::IoReader.new({},[@input]))
         end
         operations.inject{|m,f| f.args = [f.args||[]].flatten.unshift(m); f }
     end
 
-    def self.transform_call(d)
+    def transform_call(d)
         klass, options = Ciphr::Functions[d[:name].to_s]
         f = klass.new(options, [d[:arguments]||[]].flatten)
         f.invert = true if d[:invert]

@@ -1,6 +1,9 @@
 require 'openssl'
 require 'base64'
 require 'cgi'
+require 'base32'
+#require 'base32/crockford'
+#require 'zbase32'
 
 module Ciphr
   module Functions
@@ -26,7 +29,7 @@ module Ciphr
     end
 
     def self.[](name)
-      @function_aliases[name]
+      @function_aliases[name] || (raise InvalidFunctionError.new(name))
     end
 
     def self.functions
@@ -202,25 +205,62 @@ module Ciphr
       end
     end
 
+
+    class Base32 < Base
+      def self.variants
+        [
+          [['b32','base32','b32-std','base32-std'], {:object => ::Base32 }]#, 
+          #broken
+          #[['b32-crockford','base32-crockford'], {:object => ::Base32::Crockford }],
+          #[['b32-z','base32-z'], {:object => ZBase32.new }]
+        ]
+      end
+
+      def self.params
+        [:input]
+      end
+
+      def apply
+        input = @args[0]
+        if !invert              
+          Proc.new do
+            chunk = input.read(5)
+            chunk && options[:object].encode(chunk)
+          end
+        else
+          Proc.new do
+            chunk = input.read(8)
+            chunk && options[:object].decode(chunk)
+          end
+        end
+      end
+    end
+
     class Base64 < Base
       def apply    
         input = @args[0]
         if !invert
           Proc.new do
             chunk = input.read(3)
-            chunk && ::Base64.encode64(chunk).gsub(/\s/,'')
+            chunk && ::Base64.encode64(chunk).gsub(/\s/,'').tr("+/", options[:chars][0,2]).tr("=", options[:chars][2,3])
           end
         else
           Proc.new do
             chunk = input.read(4)
             chunk = chunk && chunk + "="*(4-chunk.size) #pad
-            chunk && ::Base64.decode64(chunk)
+            chunk && ::Base64.decode64(chunk.tr(options[:chars][0,2],"+/").tr(options[:chars][2,3],"=").ljust(4,"="))
           end
         end
       end
 
       def self.variants
-        [[['b64','base64'], {}]]
+        chars = {"+"=>"p", "-"=>"h", "_"=>"u", ":"=>"c", "/"=>"s", "." => "d", "!"=>"x", "="=>"q"}
+        types = {"+/=" => ["std"], "+/" => "utf7", "+-" => "file", "-_" => "url", "._-" => "yui", 
+                 ".-" => "xml-name", "_:" => "xml-id", "_-" => "prog-id-1", "._" => "prog-id-2", "!-" => "regex"}
+        variants = types.map{|c,n| [["b64","base64"].product([c.chars.map{|c| chars[c] }.join,n]).map{|a| a.join("-")}, {:chars => c}]}
+        std = variants.select{|v| v[0].include? "b64-std"}[0] #add short aliases for standard
+        std[0] = ["b64","base64"].concat(std[0])
+        variants
       end
 
       def self.params 
@@ -446,6 +486,22 @@ module Ciphr
         Proc.new do
           $stdin.read(256)
         end
+      end
+    end
+
+    class IoReader < Function
+      def apply
+        input = args[0]
+        Proc.new do
+          input.read(256)
+        end
+      end
+    end    
+    
+    class InvalidFunctionError < StandardError
+      attr_reader :name
+      def initialize(name)
+        @name = name
       end
     end
   end
