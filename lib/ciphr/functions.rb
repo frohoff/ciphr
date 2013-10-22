@@ -59,6 +59,10 @@ module Ciphr
       def read(*args)
         @stream.read(*args)
       end
+
+      def prepend(*args)
+        @stream.prepend(*args)
+      end
     end
 
     class InvertibleFunction < Function
@@ -370,6 +374,50 @@ module Ciphr
 
       def self.params
         [:input,:ch1,:ch2]
+      end
+    end
+
+    class Replace < Function
+      def apply
+        input, searchin, replacein = @args
+        search, replace = [searchin.read, replacein.read]
+        buf = ""
+        Proc.new do
+          if buf.size == search.size && search.size > 0
+            buf = ""
+            replace
+          else
+            inchunk = input.read(1)
+            if inchunk 
+              if inchunk == search[buf.size]
+                buf += inchunk
+                ""
+              else
+                buf += inchunk
+                input.prepend(buf[1,buf.size])
+                ret = buf[0]
+                buf = ""
+                ret
+              end
+            else
+              if buf.size > 0
+                ret = buf
+                buf = ""
+                ret
+              else
+                nil
+              end
+            end
+          end
+        end
+      end
+
+      def self.variants
+        [ [['repl','replace'], {}] ]
+      end
+
+      def self.params
+        [:input,:search,:replace]
       end
     end
 
