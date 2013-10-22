@@ -350,6 +350,28 @@ module Ciphr
       end
     end
 
+    class Translate < Function
+      def apply
+        input, ch1in, ch2in = @args
+        ch1, ch2 = [ch1in.read, ch2in.read]
+        Proc.new do
+          inchunk = input.read(1)
+          if inchunk
+            inchunk.tr(ch1, ch2)
+          else
+            nil
+          end
+        end
+      end
+
+      def self.variants
+        [ [['tr','translate'], {}] ]
+      end
+
+      def self.params
+        [:input,:ch1,:ch2]
+      end
+    end
 
     OPENSSL_DIGESTS = %w(md2 md4 md5 sha sha1 sha224 sha256 sha384 sha512)
 
