@@ -28,6 +28,10 @@ module Ciphr
       end
     end
 
+    def prepend(str)
+      @buffer = str + @buffer
+    end
+
     private
       def fill
         data = @reader.call
