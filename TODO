@@ -4,7 +4,9 @@ TODO:
 Context objects, Classes method_missing delegate to singleton instance
 TTY handling: default trailing newline, colors/escapes for non-printable
 tr, replace functions
-
+interleave/concat multiple streams
+vararg functions
+switch endianness
 
 fix
 -----------

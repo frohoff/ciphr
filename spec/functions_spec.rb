@@ -7,7 +7,7 @@ describe Ciphr::Functions do
         Ciphr::Functions.functions.should == 
             [
                 [Ciphr::Functions::Base2, [[["b2", "base2", "bin", "binary"], {}]]], 
-                [Ciphr::Functions::Cat, [[["cat", "noop"], {}]]]
+                [Ciphr::Functions::Cat, [[["cat", "catenate"], {}]]]
             ]
         Ciphr::Functions.function_aliases.should == 
             {
@@ -16,7 +16,7 @@ describe Ciphr::Functions do
                 "bin"=>[Ciphr::Functions::Base2, {}], 
                 "binary"=>[Ciphr::Functions::Base2, {}],                 
                 "cat"=>[Ciphr::Functions::Cat, {}], 
-                "noop"=>[Ciphr::Functions::Cat, {}]
+                "catenate"=>[Ciphr::Functions::Cat, {}]
             }
     end
     it "sets up the automatically registered functions" do
@@ -24,7 +24,7 @@ describe Ciphr::Functions do
         Ciphr::Functions.functions.should include(
             [Ciphr::Functions::Base2, [[["b2", "base2","bin","binary"], {}]]])
         Ciphr::Functions.functions.should include( 
-            [Ciphr::Functions::Cat, [[["cat", "noop"], {}]]])
+            [Ciphr::Functions::Cat, [[["cat", "catenate"], {}]]])
     end
   end
 end
