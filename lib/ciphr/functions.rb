@@ -72,7 +72,7 @@ module Ciphr
 
     class Cat < Function
       def self.variants
-        [[['cat','noop'], {}]]
+        [[['cat','catenate'], {}]]
       end
 
       def self.params
@@ -302,6 +302,34 @@ module Ciphr
       def self.params 
         [:input]
       end      
+    end
+
+    class BinaryTruncBitwise < Function
+      def apply
+        input,keyinput = @args
+        Proc.new do
+          keychunk = keyinput.read(256)
+          inchunk = input.read(256)
+          if inchunk && keychunk
+            a,b=[inchunk,keychunk].sort_by{|x| x.size}
+            a.bytes.each_with_index.map{|c,i|c.send(@options[:op], b.bytes.to_a[i%b.size])}.pack("c*")
+          else
+            nil
+          end
+        end
+      end
+
+      def self.variants
+        [
+          ['and-trunc', {:op=>:&}],
+          ['or-trunc', {:op=>:|}],
+          [['xor-trunc'], {:op=>:'^'}]
+        ]
+      end
+
+      def self.params
+        [:input, :input]
+      end
     end
 
     class BinaryBitwise < Function
