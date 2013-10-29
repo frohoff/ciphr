@@ -80,9 +80,19 @@ module Ciphr
       end
 
       def apply
-        input = @args[0]
+        inputs = @args
+        i = 0
+        chunk = nil
         Proc.new do
-          input.read(256)
+          chunk = inputs[i].read(256)
+          if ! chunk
+            i += 1
+            chunk = inputs[i] && inputs[i].read(256)
+          end
+          #while !(chunk = inputs[i].read(256)) && i < inputs.size
+          #  i++
+          #end 
+          chunk
         end
       end
     end 
