@@ -10,6 +10,7 @@ Slop.parse do
   on :h, :help
   on :v, :verbose
   on :n, :'no-newline'
+  on :N, :'newline'
 
   run do |opts, args|
 
@@ -25,6 +26,7 @@ Slop.parse do
             }
         end
     else
+      newline = opts[:newline] || STDOUT.tty? && ! opts[:'no-newline']
       spec = args.join(" ")
       begin
         parsed = Ciphr::Parser.new.parse(spec)
@@ -33,7 +35,7 @@ Slop.parse do
         while chunk = transformed.read(256)
           $stdout.print chunk
         end
-        puts if !opts[:'no-newline']
+        puts if newline 
       rescue Parslet::ParseFailed => e
         $stderr.puts e.cause
         $stderr.puts spec
