@@ -1,7 +1,10 @@
 TODO:
 ==========================
 
-broken pipe errors
+Document use of bash anon named pipes with @ syntax
+spaces in various places in grammar (between @ and filename, spaces inside of [] and () for calls)
+
+xor hangs with large keyfiles
 Context objects, Classes method_missing delegate to singleton instance
 TTY handling: default trailing newline, colors/escapes for non-printable
 tr, replace functions

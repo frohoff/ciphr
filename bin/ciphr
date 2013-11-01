@@ -32,8 +32,12 @@ Slop.parse do
         parsed = Ciphr::Parser.new.parse(spec)
         transformed = Ciphr::Transformer.new($stdin).apply(parsed)
      
-        while chunk = transformed.read(256)
-          $stdout.print chunk
+        while (chunk = transformed.read(256)) && ! $stdout.closed?
+          begin
+            $stdout.print chunk
+          rescue Errno::EPIPE 
+            break
+          end
         end
         puts if newline 
       rescue Parslet::ParseFailed => e
