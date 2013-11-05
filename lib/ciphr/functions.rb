@@ -345,12 +345,12 @@ module Ciphr
     class BinaryBitwise < Function
       def apply
         input,keyinput = @args
-        key = keyinput.read
+        keyb = keyinput.read.bytes
         Proc.new do
-          inchunk = input.read(key.size)
+          inchunk = input.read(keyb.size)
           if inchunk
-            a,b=[inchunk,key]
-            a.bytes.each_with_index.map{|c,i|c.send(@options[:op], b.bytes.to_a[i%b.size])}.pack("c*")
+            inchunkb = inchunk.bytes
+            inchunkb.each_with_index.map{|c,i|c.send(@options[:op], keyb[i%inchunkb.size])}.pack("c*")
           else
             nil
           end
