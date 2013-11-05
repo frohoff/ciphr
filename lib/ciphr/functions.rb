@@ -345,7 +345,7 @@ module Ciphr
     class BinaryBitwise < Function
       def apply
         input,keyinput = @args
-        keyb = keyinput.read.bytes
+        keyb = keyinput.read.bytes.to_a
         Proc.new do
           inchunk = input.read(keyb.size)
           if inchunk
