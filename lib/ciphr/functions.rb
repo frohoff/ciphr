@@ -349,7 +349,7 @@ module Ciphr
         Proc.new do
           inchunk = input.read(keyb.size)
           if inchunk
-            inchunkb = inchunk.bytes
+            inchunkb = inchunk.bytes.to_a
             inchunkb.each_with_index.map{|c,i|c.send(@options[:op], keyb[i%inchunkb.size])}.pack("c*")
           else
             nil
