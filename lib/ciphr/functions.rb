@@ -2,6 +2,7 @@ require 'openssl'
 require 'base64'
 require 'cgi'
 require 'base32'
+require 'zlib'
 #require 'base32/crockford'
 #require 'zbase32'
 
@@ -557,6 +558,40 @@ module Ciphr
         [:input, :key]
       end
     end
+
+    class Deflate < InvertibleFunction
+      def apply
+        input = @args[0]
+        zstream = invert ? Zlib::Inflate.new : Zlib::Deflate.new
+        Proc.new do
+          chunk = input.read(256)
+          if chunk
+            if invert
+              zstream.inflate(chunk)
+            else
+              zstream.deflate(chunk,Zlib::SYNC_FLUSH)
+            end
+          else
+            begin
+              #zstream.finish if invert
+            ensure
+              zstream.close
+            end
+          end
+        end
+      end
+
+      def self.variants
+        [
+          [['deflate'], {}]
+        ]
+      end
+
+      def self.params 
+        [:input]
+      end
+    end
+
 
     class StringReader < Function
       def apply
