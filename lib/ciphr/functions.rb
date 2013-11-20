@@ -393,6 +393,32 @@ module Ciphr
       end
     end
 
+    class Repack < Function
+      def apply
+        input, ch1in, ch2in = @args
+        content, ch1, ch2 = [input.read, ch1in.read, ch2in.read]
+        Proc.new do
+          if content
+            begin
+              content.unpack(ch1).pack(ch2)
+            ensure
+              content = nil
+            end
+          else
+            nil
+          end
+        end
+      end
+
+      def self.variants
+        [ [['repack'], {}] ]
+      end
+
+      def self.params
+        [:input,:ch1,:ch2]
+      end
+    end
+
     class Translate < Function
       def apply
         input, ch1in, ch2in = @args
