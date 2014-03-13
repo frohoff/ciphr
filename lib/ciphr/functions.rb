@@ -619,6 +619,61 @@ module Ciphr
     end
 
 
+    class Gzip < InvertibleFunction
+      class UncloseableIOProxy # hack to prevent GzipWriter from closing StringIO
+        def initialize(delegate)
+          @delegate = delegate
+        end
+        
+        def method_missing(meth, *args, &block)
+          if meth.to_s != "close"
+            @delegate.send(meth, *args, &block)
+          else
+            nil
+          end
+        end
+      end
+      
+      def apply
+        input = @args[0]
+        sio = StringIO.new
+        gz = !invert ? Zlib::GzipWriter.new(UncloseableIOProxy.new(sio)) : Zlib::GzipReader.new(input) 
+        Proc.new do
+          if invert # unzip
+            gz.read(256)
+          else # zip
+            chunk = input.read(256)
+            if chunk
+              gz.write chunk 
+              sio.rewind
+              ret = sio.read
+              sio.rewind
+              ret
+            elsif gz
+              gz.close
+              gz = nil
+              sio.rewind
+              ret = sio.read
+              sio.rewind
+              ret
+            else
+              nil
+            end
+          end
+        end
+      end
+
+      def self.variants
+        [
+          [['gzip','gz'], {}]
+        ]
+      end
+
+      def self.params 
+        [:input]
+      end
+    end
+
     class StringReader < Function
       def apply
         StringProc.new(options[:string])
