@@ -486,7 +486,7 @@ module Ciphr
       end
     end
 
-    OPENSSL_DIGESTS = %w(md2 md4 md5 sha sha1 sha224 sha256 sha384 sha512)
+    OPENSSL_DIGESTS = %w(md4 md5 sha sha1 sha224 sha256 sha384 sha512) # no md2
 
     class OpenSslDigest < Function
       def self.variants
