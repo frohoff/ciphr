@@ -57,6 +57,10 @@ module Ciphr
         []
       end
 
+      def self.invertable?
+        false
+      end
+
       def read(*args)
         @stream.read(*args)
       end
@@ -68,7 +72,11 @@ module Ciphr
 
     class InvertibleFunction < Function
       @invert = false
-      attr_accessor :invert    
+      attr_accessor :invert   
+      
+      def self.invertable?
+        true
+      end 
     end
 
     class Cat < Function
@@ -152,6 +160,52 @@ module Ciphr
         end
       end
     end   
+
+
+
+    class Radix < Base
+      def self.variants
+        (2..36).map{|r| [["r#{r}","rad#{r}","radix#{r}"], {:radix => r}]}
+      end
+
+      def self.params
+        [:input]
+      end
+
+      def apply
+        radix = options[:radix]
+        input = @args[0]
+        if !invert     
+          num = 0      
+          while chunk = input.read(1)
+            num = (num << 8) + chunk.bytes.to_a[0] || num.to_s(radix)
+          end
+          Proc.new do
+            begin
+              num && num.to_s(radix) || num
+            ensure
+              num = nil
+            end
+          end
+        else
+          num = input.read().to_i(radix)
+          bytes = []
+          while num > 0
+            bytes.unshift(num & 0xff)
+            num = num >> 8
+          end
+          Proc.new do
+            begin
+              bytes && bytes.pack("c*") || bytes
+            ensure
+              bytes = nil
+            end
+          end
+        end
+      end
+    end
+
+
 
 #WARN about buffering all input
     class Base10 < Base
@@ -283,6 +337,7 @@ module Ciphr
       end
     end
  
+    #TODO: differentiate between URL and CGI encoding (with '+' char)
     class UrlEncoding < InvertibleFunction
       def apply
         input = @args[0]
@@ -297,6 +352,8 @@ module Ciphr
             if (chunk == "%")
               chunk += input.read(2)
               chunk && CGI.unescape(chunk)
+            elsif chunk == '+'
+              ' '
             else
               chunk
             end
@@ -306,7 +363,7 @@ module Ciphr
 
       def self.variants
         [
-          [['url','uri'],{}]
+          [['url','uri','cgi'],{}]
         ]
       end
 
