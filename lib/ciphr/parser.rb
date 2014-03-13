@@ -44,10 +44,10 @@ class Ciphr::Transformer < Parslet::Transform
         #eagerly eval these?
         #trim to nearest byte vs chunk?
         rule(:string => simple(:v)) {|d| Ciphr::Functions::StringReader.new({:string => d[:v]},[]) }
-        rule(:b2 => simple(:v)) {|d| Ciphr::Functions::Base2.new({}, [Ciphr::Functions::StringReader.new({:string => lpad(d[:v].to_s,8,"0")},[])]).tap{|f| f.invert = true} }
-        rule(:b8 => simple(:v)) {|d| Ciphr::Functions::Base8.new({}, [Ciphr::Functions::StringReader.new({:string => lpad(d[:v].to_s,8,"0")},[])]).tap{|f| f.invert = true} }
-        rule(:b10 => simple(:v)) {|d| Ciphr::Functions::Base10.new({}, [Ciphr::Functions::StringReader.new({:string => d[:v].to_s},[])]).tap{|f| f.invert = true} }
-        rule(:b16 => simple(:v)) {|d| Ciphr::Functions::Base16.new({}, [Ciphr::Functions::StringReader.new({:string => lpad(d[:v].to_s,2,"0")},[])]).tap{|f| f.invert = true} }
+        rule(:b2 => simple(:v)) {|d| Ciphr::Functions::Radix.new({:radix => 2}, [Ciphr::Functions::StringReader.new({:string => lpad(d[:v].to_s,8,"0")},[])]).tap{|f| f.invert = true} }
+        rule(:b8 => simple(:v)) {|d| Ciphr::Functions::Radix.new({:radix => 8}, [Ciphr::Functions::StringReader.new({:string => lpad(d[:v].to_s,8,"0")},[])]).tap{|f| f.invert = true} }
+        rule(:b10 => simple(:v)) {|d| Ciphr::Functions::Radix.new({:radix => 10}, [Ciphr::Functions::StringReader.new({:string => d[:v].to_s},[])]).tap{|f| f.invert = true} }
+        rule(:b16 => simple(:v)) {|d| Ciphr::Functions::Radix.new({:radix => 16}, [Ciphr::Functions::StringReader.new({:string => lpad(d[:v].to_s,2,"0")},[])]).tap{|f| f.invert = true} }
         rule(:b64 => simple(:v)) {|d| Ciphr::Functions::Base64.new({:chars => "+/="}, [Ciphr::Functions::StringReader.new({:string => d[:v]},[])]).tap{|f| f.invert = true} }
         rule(:arguments => sequence(:arguments), :invert => simple(:invert), :name => simple(:name)) {|d| transform_call(d) }
         rule(:arguments => simple(:arguments), :invert => simple(:invert), :name => simple(:name)) {|d| transform_call(d) }
