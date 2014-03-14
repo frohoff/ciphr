@@ -60,6 +60,10 @@ module Ciphr
       def self.invertable?
         false
       end
+      
+      def self.padding?
+        false
+      end
 
       def read(*args)
         @stream.read(*args)
@@ -107,6 +111,9 @@ module Ciphr
     end 
 
     class Base < InvertibleFunction
+      def self.padding?
+        true
+      end
     end
 
     class Base2 < Base
@@ -159,11 +166,11 @@ module Ciphr
           end
         end
       end
-    end   
+    end
 
 
 
-    class Radix < Base
+    class Radix < InvertibleFunction
       def self.variants
         (2..36).map{|r| [["r#{r}","rad#{r}","radix#{r}"], {:radix => r}]}
       end
@@ -705,6 +712,7 @@ module Ciphr
               sio.rewind
               ret = sio.read
               sio.rewind
+              sio.truncate(0)
               ret
             elsif gz
               gz.close
@@ -712,6 +720,7 @@ module Ciphr
               sio.rewind
               ret = sio.read
               sio.rewind
+              sio.truncate(0)
               ret
             else
               nil
