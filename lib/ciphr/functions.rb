@@ -61,8 +61,8 @@ module Ciphr
         false
       end
       
-      def self.padding?
-        false
+      def self.aligned
+        nil
       end
 
       def read(*args)
@@ -111,9 +111,9 @@ module Ciphr
     end 
 
     class Base < InvertibleFunction
-      def self.padding?
-        true
-      end
+      def self.aligned
+        :left
+      end      
     end
 
     class Base2 < Base
@@ -168,9 +168,11 @@ module Ciphr
       end
     end
 
-
-
     class Radix < InvertibleFunction
+      def self.aligned
+        :right
+      end
+      
       def self.variants
         (2..36).map{|r| [["r#{r}","rad#{r}","radix#{r}"], {:radix => r}]}
       end
@@ -196,50 +198,6 @@ module Ciphr
           end
         else
           num = input.read().to_i(radix)
-          bytes = []
-          while num > 0
-            bytes.unshift(num & 0xff)
-            num = num >> 8
-          end
-          Proc.new do
-            begin
-              bytes && bytes.pack("c*") || bytes
-            ensure
-              bytes = nil
-            end
-          end
-        end
-      end
-    end
-
-
-
-#WARN about buffering all input
-    class Base10 < Base
-      def self.variants
-        [[['b10','base10','dec','decimal'], {}]]
-      end
-
-      def self.params
-        [:input]
-      end
-
-      def apply
-        input = @args[0]
-        if !invert     
-          num = 0      
-          while chunk = input.read(1)
-            num = (num << 8) + chunk.bytes.to_a[0] || num.to_s(10)
-          end
-          Proc.new do
-            begin
-              num && num.to_s(10) || num
-            ensure
-              num = nil
-            end
-          end
-        else
-          num = input.read().to_i(10)
           bytes = []
           while num > 0
             bytes.unshift(num & 0xff)
@@ -313,6 +271,10 @@ module Ciphr
     end
 
     class Base64 < Base
+      def self.aligned
+        nil # preserves alignment
+      end      
+      
       def apply    
         input = @args[0]
         if !invert

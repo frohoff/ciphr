@@ -1,3 +1,4 @@
+require 'spec_helper'
 require 'ciphr'
 
 # considerations:
@@ -8,11 +9,16 @@ require 'ciphr'
 
 describe Ciphr::Functions do
   r = Random.new(0) #deterministic
-  tests = [""] + (1..10).map do |i|
-    r.bytes(r.rand(1000))
+  tests = [""] + (1..50).map do |i|
+    mag = r.rand(4)+1
+    len = r.rand(10**mag)
+    #len = (0.00001*r.rand(100000)**1.7).floor
+    $stderr.puts len
+    r.bytes(len)
   end
   
   Ciphr::Functions.setup
+  #TODO: run shorter/smaller tests first
   
   functions = Ciphr::Functions.functions
   functions.find_all{|f| f[0].params.size == 1}.each do |f|
@@ -26,9 +32,12 @@ describe Ciphr::Functions do
           if f[0].invertable? && t != ""
             inv = Ciphr.transform("~" + v[0][0],result)
             #FIXME: need to enforce consistent encoding
-            inv,t = [inv.force_encoding('binary'), t.force_encoding('binary')]
-            if f[0].padding? #for left-aligned, right-padded base functions
-              expect(inv).to start_with(t)  
+            inv,t = [inv,t].map{|s| s.force_encoding('binary')}
+            case f[0].aligned # FIXME: this is horrible
+            when :left
+              expect(inv).to start_with(t)
+            when :right
+              expect(t).to end_with(inv) # FIXME: horribly backwards
             else
               expect(inv).to eq(t)
             end
