@@ -68,7 +68,7 @@ Requires bundler to be installed (`gem install bundler`)
 git clone https://github.com/frohoff/ciphr.git
 cd ciphr
 bundle install
-rake install
+bundle exec rake install
 ```
 
 ## Usage
@@ -190,7 +190,7 @@ cd ciphr
 
 Run command from exploded gem/project directory:
 ```shell
-ruby -Ilib bin/ciphr [args]
+bundle exec ruby -Ilib bin/ciphr [args]
 ```
 
 ## Contributing
