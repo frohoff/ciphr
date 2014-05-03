@@ -187,11 +187,11 @@ module Ciphr
         if !invert     
           num = 0      
           while chunk = input.read(1)
-            num = (num << 8) + chunk.bytes.to_a[0] || num.to_s(radix)
+            num = (num << 8) + chunk.bytes.to_a[0]
           end
           Proc.new do
             begin
-              num && num.to_s(radix) || num
+              num && num.to_s(radix)
             ensure
               num = nil
             end
@@ -205,7 +205,7 @@ module Ciphr
           end
           Proc.new do
             begin
-              bytes && bytes.pack("c*") || bytes
+              bytes && bytes.pack("c*")
             ensure
               bytes = nil
             end
