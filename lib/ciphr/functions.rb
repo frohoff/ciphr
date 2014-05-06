@@ -777,11 +777,7 @@ module Ciphr
 
         Proc.new do
           byte = input.read(1)
-          $stderr.puts("byte #{byte.inspect}")
           if byte
-            $stderr.puts("i #{i}")
-            $stderr.puts("j #{j}")
-            $stderr.puts("got input #{byte.inspect}")
             i = (i + 1) % 256
             j = (j + s[i]) % 256
             swp = s[i]
@@ -789,10 +785,8 @@ module Ciphr
             s[j] = swp
             k = s[(s[i] + s[j]) % 256]
             m = [(byte.unpack('c*')[0] ^ k)].pack('c*') 
-            $stderr.puts("sending output #{m.inspect}")
             m
           else
-            $stderr.puts("done")
             nil
           end
         end
