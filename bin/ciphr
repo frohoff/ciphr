@@ -9,6 +9,8 @@ Slop.parse do
   on :v, :verbose
   on :n, :'no-newline'
   on :N, :'newline'
+  on :x, :'xargs-mode'
+  on :'0', :null
 
   run do |opts, args|
     Ciphr::Functions.setup
@@ -22,19 +24,28 @@ Slop.parse do
             }
         end
     else
-      newline = opts[:newline] || STDOUT.tty? && ! opts[:'no-newline']
+      newline = opts[:newline] || opts[:'xargs-mode'] || STDOUT.tty? && ! opts[:'no-newline']
       spec = args.join(" ")
       begin
         parsed = Ciphr::Parser.new.parse(spec)
-        transformed = Ciphr::Transformer.new($stdin).apply(parsed)
-        while (chunk = transformed.read(256)) && ! $stdout.closed?
-          begin
-            $stdout.print(chunk)
-          rescue Errno::EPIPE 
-            break
+        if opts[:'xargs-mode']
+          delim = opts['null'] ? "\x00" : "\n"
+          $stdin.each_line(delim) do |line|
+            transformed = Ciphr::Transformer.new(StringIO.new(line.tr(delim,''))).apply(parsed)
+            $stdout.print transformed.read
+            puts if newline
           end
+        else 
+          transformed = Ciphr::Transformer.new($stdin).apply(parsed)
+          while (chunk = transformed.read(256)) && ! $stdout.closed?
+            begin
+              $stdout.print(chunk)
+            rescue Errno::EPIPE 
+              break
+            end
+          end
+          puts if newline 
         end
-        puts if newline 
       rescue Parslet::ParseFailed => e
         $stderr.puts e.cause
         $stderr.puts spec
