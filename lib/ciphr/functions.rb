@@ -572,8 +572,9 @@ module Ciphr
         cipher.send(invert ? :decrypt : :encrypt)
         cipher.key = key.read
         random_iv = cipher.random_iv
-        block_size = random_iv.size
-        cipher.iv = invert ? input.read(block_size) : random_iv
+        if random_iv.size > 0
+          cipher.iv = invert ? input.read(random_iv.size) : random_iv
+        end
         Proc.new do
           if ! invert && random_iv
             begin
