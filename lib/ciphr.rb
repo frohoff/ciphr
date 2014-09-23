@@ -8,7 +8,7 @@ module Ciphr
 
 	def self.init()
 		@@init = true
-		Ciphr::Functions.setup
+		Ciphr::FunctionRegistry.global.setup
 	end 
 
 	def self.transform(spec, input = STDIN, output = STDOUT)

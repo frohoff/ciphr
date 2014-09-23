@@ -1,3 +1,5 @@
+# strictly used by parser classes for literals/wiring
+
 module Ciphr::Functions
   class StringReader < Function
     def apply
@@ -26,14 +28,6 @@ module Ciphr::Functions
         chunk = f.read(256)
         f.close if ! chunk
         chunk
-      end
-    end
-  end
-
-  class StdInReader < Function
-    def apply
-      Proc.new do
-        $stdin.read(256)
       end
     end
   end
