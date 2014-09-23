@@ -1,9 +1,10 @@
 require 'openssl'
 
-module Ciphr::Functions
+module Ciphr::Functions::OpenSSL
   OPENSSL_DIGESTS = %w(md4 md5 sha sha1 sha224 sha256 sha384 sha512) # no md2
+  #TODO: fail/ignore gracefully with error/warning if openssl unavailable
 
-  class OpenSslDigest < Function
+  class OpenSslDigest < Ciphr::Functions::Function
     def self.variants
       OPENSSL_DIGESTS.map{|d| [d, {:variant => d}]}
     end
@@ -54,7 +55,7 @@ module Ciphr::Functions
 
 
 
-  class OpenSslCipher < InvertibleFunction
+  class OpenSslCipher < Ciphr::Functions::InvertibleFunction
     def apply
       input, key = @args
       cipher = OpenSSL::Cipher.new(@options[:variant])

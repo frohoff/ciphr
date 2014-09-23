@@ -40,15 +40,15 @@ class Ciphr::Transformer < Parslet::Transform
 
         #in ctor to provide instance scope to rule blocks
         rule(:name => simple(:v)) { v } 
-        rule(:file => simple(:v)) {|d| Ciphr::Functions::FileReader.new({:file => d[:v].to_s}, [])}
+        rule(:file => simple(:v)) {|d| Ciphr::Functions::Reader::FileReader.new({:file => d[:v].to_s}, [])}
         #eagerly eval these?
         #trim to nearest byte vs chunk?
-        rule(:string => simple(:v)) {|d| Ciphr::Functions::StringReader.new({:string => d[:v]},[]) }
-        rule(:b2 => simple(:v)) {|d| Ciphr::Functions::Base2.new({:radix => 2}, [Ciphr::Functions::StringReader.new({:string => lpad(d[:v].to_s,8,"0")},[])]).tap{|f| f.invert = true} }
-        rule(:b8 => simple(:v)) {|d| Ciphr::Functions::Base8.new({:radix => 8}, [Ciphr::Functions::StringReader.new({:string => lpad(d[:v].to_s,8,"0")},[])]).tap{|f| f.invert = true} }
-        rule(:b10 => simple(:v)) {|d| Ciphr::Functions::Radix.new({:radix => 10}, [Ciphr::Functions::StringReader.new({:string => d[:v].to_s},[])]).tap{|f| f.invert = true} }
-        rule(:b16 => simple(:v)) {|d| Ciphr::Functions::Base16.new({:radix => 16}, [Ciphr::Functions::StringReader.new({:string => lpad(d[:v].to_s,2,"0")},[])]).tap{|f| f.invert = true} }
-        rule(:b64 => simple(:v)) {|d| Ciphr::Functions::Base64.new({:chars => "+/="}, [Ciphr::Functions::StringReader.new({:string => d[:v]},[])]).tap{|f| f.invert = true} }
+        rule(:string => simple(:v)) {|d| Ciphr::Functions::Reader::StringReader.new({:string => d[:v]},[]) }
+        rule(:b2 => simple(:v)) {|d| Ciphr::Functions::Base::Base2.new({:radix => 2}, [Ciphr::Functions::Reader::StringReader.new({:string => lpad(d[:v].to_s,8,"0")},[])]).tap{|f| f.invert = true} }
+        rule(:b8 => simple(:v)) {|d| Ciphr::Functions::Base::Base8.new({:radix => 8}, [Ciphr::Functions::Reader::StringReader.new({:string => lpad(d[:v].to_s,8,"0")},[])]).tap{|f| f.invert = true} }
+        rule(:b10 => simple(:v)) {|d| Ciphr::Functions::Base::Radix.new({:radix => 10}, [Ciphr::Functions::Reader::StringReader.new({:string => d[:v].to_s},[])]).tap{|f| f.invert = true} }
+        rule(:b16 => simple(:v)) {|d| Ciphr::Functions::Base::Base16.new({:radix => 16}, [Ciphr::Functions::Reader::StringReader.new({:string => lpad(d[:v].to_s,2,"0")},[])]).tap{|f| f.invert = true} }
+        rule(:b64 => simple(:v)) {|d| Ciphr::Functions::Base::Base64.new({:chars => "+/="}, [Ciphr::Functions::Reader::StringReader.new({:string => d[:v]},[])]).tap{|f| f.invert = true} }
         rule(:arguments => sequence(:arguments), :invert => simple(:invert), :name => simple(:name)) {|d| transform_call(d) }
         rule(:arguments => simple(:arguments), :invert => simple(:invert), :name => simple(:name)) {|d| transform_call(d) }
         rule(:invert => simple(:invert), :name => simple(:name)) {|d| transform_call(d) }
@@ -63,7 +63,7 @@ class Ciphr::Transformer < Parslet::Transform
     def transform_operations(d)
         operations = [d[:operations]].flatten
         if operations[0].args.size < operations[0].class.params.size
-            operations.unshift(Ciphr::Functions::IoReader.new({},[@input]))
+            operations.unshift(Ciphr::Functions::Reader::IoReader.new({},[@input]))
         end
         operations.inject{|m,f| f.args = [f.args||[]].flatten.unshift(m); f }
     end

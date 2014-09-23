@@ -1,5 +1,5 @@
-module Ciphr::Functions
-  class Cat < Function
+module Ciphr::Functions::Simple
+  class Cat < Ciphr::Functions::Function
     def self.variants
       [[['cat','catenate'], {}]]
     end
@@ -26,7 +26,7 @@ module Ciphr::Functions
     end
   end 
 
-  class Repack < Function
+  class Repack < Ciphr::Functions::Function
     def apply
       input, ch1in, ch2in = @args
       content, ch1, ch2 = [input.read, ch1in.read, ch2in.read]
@@ -52,7 +52,7 @@ module Ciphr::Functions
     end
   end
 
-  class Translate < Function
+  class Translate < Ciphr::Functions::Function
     def apply
       input, ch1in, ch2in = @args
       ch1, ch2 = [ch1in.read, ch2in.read]
@@ -75,7 +75,7 @@ module Ciphr::Functions
     end
   end
 
-  class Replace < Function
+  class Replace < Ciphr::Functions::Function
     def apply
       input, searchin, replacein = @args
       search, replace = [searchin.read, replacein.read]

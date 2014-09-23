@@ -30,7 +30,7 @@ describe Ciphr::Functions do
       tests.each do |t|
         it "#{v[0][0]} #{t.inspect}" do
           result = Ciphr.transform(v[0][0],t)
-          if f[0] != Ciphr::Functions::Cat && t != ""
+          if f[0] != Ciphr::Functions::Simple::Cat && t != ""
             expect(result).not_to eq(t)
           end
           if f[0].invertable? && t != ""

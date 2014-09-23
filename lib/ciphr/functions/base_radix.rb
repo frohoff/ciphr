@@ -1,8 +1,8 @@
 require 'base64'
 require 'base32'
 
-module Ciphr::Functions
-  class Base < InvertibleFunction
+module Ciphr::Functions::Base
+  class Base < Ciphr::Functions::InvertibleFunction
     def self.aligned
       :left
     end      
@@ -152,7 +152,12 @@ module Ciphr::Functions
     end
   end    
 
-  class Radix < InvertibleFunction
+end
+
+module Ciphr::Functions::Radix
+
+
+  class Radix < Ciphr::Functions::InvertibleFunction
     def self.aligned
       :right
     end
