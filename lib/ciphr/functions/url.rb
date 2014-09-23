@@ -1,8 +1,8 @@
 require 'cgi'
 
-module Ciphr::Functions
+module Ciphr::Functions::URL
   #TODO: differentiate between URL and CGI encoding (with '+' char)
-  class UrlEncoding < InvertibleFunction
+  class UrlEncoding < Ciphr::Functions::InvertibleFunction
     def apply
       input = @args[0]
       if !invert

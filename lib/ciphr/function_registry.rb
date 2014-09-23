@@ -36,6 +36,12 @@ module Ciphr
     def self.global
       @@global
     end
-
   end
+
+  class InvalidFunctionError < StandardError
+    attr_reader :name
+    def initialize(name)
+      @name = name
+    end
+  end  
 end

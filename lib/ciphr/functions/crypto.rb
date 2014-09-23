@@ -1,5 +1,5 @@
-module Ciphr::Functions
-  class RC4Cipher < InvertibleFunction
+module Ciphr::Functions::Crypto
+  class RC4Cipher < Ciphr::Functions::InvertibleFunction
     def apply
       input, key = @args
       keybytes = key.read.unpack('c*')

@@ -49,13 +49,6 @@ module Ciphr::Functions
       true
     end 
   end
-  
-  class InvalidFunctionError < StandardError
-    attr_reader :name
-    def initialize(name)
-      @name = name
-    end
-  end
 end
 
 require_relative 'functions/openssl'

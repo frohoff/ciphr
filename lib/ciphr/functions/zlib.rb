@@ -1,7 +1,7 @@
 require 'zlib'
 
-module Ciphr::Functions
-  class Deflate < InvertibleFunction
+module Ciphr::Functions::ZLib
+  class Deflate < Ciphr::Functions::InvertibleFunction
     def apply
       input = @args[0]
       zstream = invert ? Zlib::Inflate.new : Zlib::Deflate.new
@@ -35,7 +35,7 @@ module Ciphr::Functions
   end
 
 
-  class Gzip < InvertibleFunction
+  class Gzip < Ciphr::Functions::InvertibleFunction
     class UncloseableIOProxy # hack to prevent GzipWriter from closing StringIO
       def initialize(delegate)
         @delegate = delegate

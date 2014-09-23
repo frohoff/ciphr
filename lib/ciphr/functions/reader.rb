@@ -1,7 +1,8 @@
 # strictly used by parser classes for literals/wiring
+# TODO: disable registration
 
-module Ciphr::Functions
-  class StringReader < Function
+module Ciphr::Functions::Reader
+  class StringReader < Ciphr::Functions::Function
     def apply
       StringProc.new(options[:string])
     end
@@ -21,7 +22,7 @@ module Ciphr::Functions
     end      
   end
 
-  class FileReader < Function
+  class FileReader < Ciphr::Functions::Function
     def apply
       f = File.open(options[:file], "r")
       Proc.new do
@@ -32,7 +33,7 @@ module Ciphr::Functions
     end
   end
 
-  class IoReader < Function
+  class IoReader < Ciphr::Functions::Function
     def apply
       input = args[0]
       Proc.new do

@@ -1,5 +1,5 @@
-module Ciphr::Functions
-	class BinaryTruncBitwise < Function
+module Ciphr::Functions::Bitwise
+	class BinaryTruncBitwise < Ciphr::Functions::Function
 	  def apply
 	    input,keyinput = @args
 	    Proc.new do
@@ -27,7 +27,7 @@ module Ciphr::Functions
 	  end
 	end
 
-	class BinaryBitwise < Function
+	class BinaryBitwise < Ciphr::Functions::Function
 	  def apply
 	    input,keyinput = @args
 	    keyb = keyinput.read.bytes.to_a
@@ -55,7 +55,7 @@ module Ciphr::Functions
 	  end
 	end
 
-	class UnaryBitwise < Function
+	class UnaryBitwise < Ciphr::Functions::Function
 	  def apply
 	    input = @args[0]
 	    Proc.new do
