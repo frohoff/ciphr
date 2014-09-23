@@ -13,14 +13,18 @@ describe Ciphr::Functions do
     mag = r.rand(4)+1
     len = r.rand(10**mag)
     #len = (0.00001*r.rand(100000)**1.7).floor
-    $stderr.puts len
+    #$stderr.puts len
     r.bytes(len)
   end
+
+  # temporarily disable randomization
+  tests = [""," ", "\x00", "\x00 A"]
   
-  Ciphr::Functions.setup
+  Ciphr::FunctionRegistry.global.setup
   #TODO: run shorter/smaller tests first
   
-  functions = Ciphr::Functions.functions
+  #TODO: decompose property tests into small, composable tests
+  functions = Ciphr::FunctionRegistry.global.functions
   functions.find_all{|f| f[0].params.size == 1}.each do |f|
     f[1].each do |v|
       tests.each do |t|
