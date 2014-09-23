@@ -69,7 +69,7 @@ class Ciphr::Transformer < Parslet::Transform
     end
 
     def transform_call(d)
-        klass, options = Ciphr::Functions[d[:name].to_s]
+        klass, options = Ciphr::FunctionRegistry.global[d[:name].to_s]
         f = klass.new(options, [d[:arguments]||[]].flatten)
         f.invert = true if d[:invert]
         f
