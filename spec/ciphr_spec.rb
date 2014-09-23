@@ -12,6 +12,8 @@ describe Ciphr do
         Ciphr.transform('0x41',"").should be == "A"
         Ciphr.transform('0b01000001',"").should be == "A"
         Ciphr.transform('0x43 xor[0x01]',"").should be == "B"
+        Ciphr.transform('0x00 url', "").should be == '%00'
+        Ciphr.transform('"foo" cat', "").should be == 'foo'
     end
   end
 end
