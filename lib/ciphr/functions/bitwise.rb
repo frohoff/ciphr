@@ -30,12 +30,13 @@ module Ciphr::Functions::Bitwise
 	class BinaryBitwise < Ciphr::Functions::Function
 	  def apply
 	    input,keyinput = @args
-	    keyb = keyinput.read.bytes.to_a
+            keyb, inputb = [keyinput.read.bytes.to_a, input.read.bytes.to_a].sort_by{|a| a.size }
 	    Proc.new do
-	      inchunk = input.read(keyb.size)
-	      if inchunk
-	        inchunkb = inchunk.bytes.to_a
-	        inchunkb.each_with_index.map{|c,i|c.send(@options[:op], keyb[i%inchunkb.size])}.pack("c*")
+	      if inputb
+	        resb = inputb.each_with_index.map{|c,i|c.send(@options[:op], keyb[i%keyb.size])}
+                res = resb.pack("c*")
+                inputb = nil
+                res
 	      else
 	        nil
 	      end
