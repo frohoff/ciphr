@@ -1,4 +1,4 @@
-require 'coveralls'
-require "codeclimate-test-reporter"
-Coveralls.wear!
-CodeClimate::TestReporter.start
+#require 'coveralls'
+#require "codeclimate-test-reporter"
+#Coveralls.wear!
+#CodeClimate::TestReporter.start
