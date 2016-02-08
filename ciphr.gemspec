@@ -13,20 +13,20 @@ Gem::Specification.new do |spec|
   spec.homepage      = ""
   spec.license       = "MIT"
 
-  spec.files         = `git ls-files`.split($/)
-  spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
-  spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
+  spec.files         = Dir['**/*'] 
+  spec.executables   = Dir['bin/**/*'] 
+  spec.test_files    =  Dir['test/**/*', 'spec/**/*'] 
   spec.require_paths = ["lib"]
 
   spec.add_development_dependency "bundler", "~> 1.3"
-  spec.add_development_dependency "rake"
-  spec.add_development_dependency "rspec"
-  spec.add_development_dependency "pry"
-  spec.add_development_dependency 'coveralls'
-  spec.add_development_dependency 'codeclimate-test-reporter'
+  spec.add_development_dependency "rake", "~> 10.5.0"
+  spec.add_development_dependency "rspec", "~> 3.4.0"
+  #spec.add_development_dependency 'coveralls'
+  #spec.add_development_dependency 'codeclimate-test-reporter'
 
-  spec.add_dependency "parslet"
-  spec.add_dependency "base32"
+  spec.add_dependency "parslet", "~> 1.5.0"
+  spec.add_dependency "slop", "~> 3.6.0"
+  spec.add_dependency "base32", "~> 0.3.2"
   #spec.add_dependency "base32-crockford"
   #spec.add_dependency "zbase32"
 end
