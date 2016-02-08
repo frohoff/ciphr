@@ -20,7 +20,7 @@ class Ciphr::Parser < Parslet::Parser
     rule(:spaces)      { match('\s').repeat(1) }
     rule(:spaces?)     { spaces.maybe }
     rule(:name) { (match('[a-z]') >> match('[a-z0-9\-_]').repeat).as(:name) }
-    rule(:literal) { b2 | b8 | b10 | b16 | b64 | string | file }
+    rule(:literal) { pad { b2 | b8 | b10 | b16 | b64 | string | file } } 
     rule(:file) { str('@') >> spaces? >> ( string | match('[^ ()\[\]{},|]' ).repeat ).as(:file) }
     rule(:string) { wrapstr("'") | wrapstr('"') }
     rule(:b2) { str('0b') >> match('[0-1]').repeat(1).as(:b2) }
