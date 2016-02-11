@@ -14,7 +14,7 @@ Gem::Specification.new do |spec|
   spec.license       = "MIT"
 
   spec.files         = Dir['**/*'] 
-  spec.executables   = Dir['bin/**/*'] 
+  spec.executables   << 'ciphr' 
   spec.test_files    =  Dir['test/**/*', 'spec/**/*'] 
   spec.require_paths = ["lib"]
 
