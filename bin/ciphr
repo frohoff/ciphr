@@ -50,7 +50,7 @@ Slop.parse do
         $stderr.puts e.cause
         $stderr.puts spec
         $stderr.puts " " * (e.cause.pos) + "^"
-      rescue Ciphr::Functions::InvalidFunctionError => e
+      rescue Ciphr::FunctionRegistry::InvalidFunctionError => e
         $stderr.puts "invalid function '#{e.name}'"
       end
     end
