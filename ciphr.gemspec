@@ -8,15 +8,17 @@ Gem::Specification.new do |spec|
   spec.version       = Ciphr::VERSION
   spec.authors       = ["Chris Frohoff"]
   spec.email         = ["chris@frohoff.org"]
-  spec.description   = "" 
-  spec.summary       = "gem for composing (en|de)coding, digest, cipher operations" 
-  spec.homepage      = ""
+  spec.summary       = "a CLI tool for performing and composing encoding, decoding, encryption, decryption, hashing, and other various operations on streams of data from the command line; mostly intended for infosec uses." 
+  spec.description   = "Ciphr is a CLI tool for performing and composing encoding, decoding, encryption, decryption, hashing, and other various operations on streams of data. It takes provided data, file data, or data from stdin, and executes a pipeline of functions on the data stream, writing the resulting data to stdout. It was designed primarily for use in the information security domain, mostly for quick or casual data manipulation for forensics, penetration testing, or capture-the-flag events; it likely could have other unforseen uses, but should be presumed to be an experimental toy as no effort was made to make included cryptographic functions robust against attacks (timing attacks, etc), and it is recommended not to use any included functions in any on-line security mechanisms." 
+  spec.homepage      = "https://github.com/frohoff/ciphr"
   spec.license       = "MIT"
-
+  
   spec.files         = Dir['**/*'] 
   spec.executables   << 'ciphr' 
   spec.test_files    =  Dir['test/**/*', 'spec/**/*'] 
   spec.require_paths = ["lib"]
+
+  spec.required_ruby_version = ">= 1.9.3"
 
   spec.add_development_dependency "bundler", "~> 1.3"
   spec.add_development_dependency "rake", "~> 10.5.0"

@@ -73,8 +73,19 @@ $ ciphr @/etc/hosts aes-128-cbc[0xdeadbeefdeadbeefdeadbeefdeadbeef] ~aes-128-cbc
 
 ## Installation
 
-Must be cloned and installed until it gets into rubygems.org after being cleaned
-up
+#### Rubygems
+
+```shell
+$ gem install ciphr
+Fetching: ciphr-0.0.1.gem (100%)
+Successfully installed ciphr-0.0.1
+Parsing documentation for ciphr-0.0.1
+Installing ri documentation for ciphr-0.0.1
+Done installing documentation for ciphr after 2 seconds
+1 gem installed
+```
+
+#### Source
 
 Requires bundler to be installed (`gem install bundler`)
 
@@ -291,8 +302,6 @@ Available Functions: aliases ([args])
   tr, translate (input, ch1, ch2)
   repl, replace (input, search, replace)
   rc4-ruby (input, key)
-
-
 ```
 
 ## Developing
