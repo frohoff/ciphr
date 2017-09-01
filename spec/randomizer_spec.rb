@@ -18,7 +18,7 @@ describe Ciphr::Functions do
   end
 
   # temporarily disable randomization
-  tests = [""," ", "\x00", "\x00 A"]
+  tests = [""," ", "\x00", "\x00 A"] + tests
   
   Ciphr::FunctionRegistry.global.setup
   #TODO: run shorter/smaller tests first
@@ -30,7 +30,7 @@ describe Ciphr::Functions do
       tests.each do |t|
         it "#{v[0][0]} #{t.inspect}" do
           result = Ciphr.transform(v[0][0],t)
-          if f[0] != Ciphr::Functions::Simple::Cat && t != ""
+          if f[0] != Ciphr::Functions::Simple::Cat && f[0] != Ciphr::Functions::Ascii::Rot13 && t != ""
             expect(result).not_to eq(t)
           end
           if f[0].invertable? && t != ""

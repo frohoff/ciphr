@@ -1,5 +1,5 @@
-module Ciphr::Functions::Bitwise
-	class Rot13 < Ciphr::Functions::Function
+module Ciphr::Functions::Ascii
+	class Rot13 < Ciphr::Functions::InvertibleFunction 
 	  def apply
 	    input = @args[0]
 	    Proc.new do

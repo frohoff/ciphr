@@ -15,8 +15,10 @@ module Ciphr
 		init if !@@init
 		if input.is_a? String
 			input = StringIO.new(input)
+			input.binmode
 			input.close_write
 			output = StringIO.new()
+			output.binmode
 		end
 
         parsed = Ciphr::Parser.new.parse(spec)

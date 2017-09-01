@@ -31,7 +31,9 @@ Slop.parse do
         if opts[:'xargs-mode']
           delim = opts['null'] ? "\x00" : "\n"
           $stdin.each_line(delim) do |line|
-            transformed = Ciphr::Transformer.new(StringIO.new(line.tr(delim,''))).apply(parsed)
+            io = StringIO.new(line.tr(delim,''))
+	    io.bindmode
+            transformed = Ciphr::Transformer.new(io).apply(parsed)
             $stdout.print transformed.read
             puts if newline
           end
