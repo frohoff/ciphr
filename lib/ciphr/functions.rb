@@ -59,4 +59,5 @@ require_relative 'functions/reader'
 require_relative 'functions/url'
 require_relative 'functions/simple'
 require_relative 'functions/crypto'
+require_relative 'functions/ascii'
 

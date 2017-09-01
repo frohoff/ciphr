@@ -25,6 +25,7 @@ module Ciphr::Functions::Reader
   class FileReader < Ciphr::Functions::Function
     def apply
       f = File.open(options[:file], "r")
+      f.binmode
       Proc.new do
         chunk = f.read(256)
         f.close if ! chunk
@@ -36,6 +37,7 @@ module Ciphr::Functions::Reader
   class IoReader < Ciphr::Functions::Function
     def apply
       input = args[0]
+      input.binmode
       Proc.new do
         input.read(256)
       end

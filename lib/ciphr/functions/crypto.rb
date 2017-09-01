@@ -14,8 +14,6 @@ module Ciphr::Functions::Crypto
       i = 0
       j = 0
 
-      $stderr.puts("key: #{keybytes.inspect}")  
-
       Proc.new do
         byte = input.read(1)
         if byte

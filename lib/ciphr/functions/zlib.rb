@@ -53,6 +53,7 @@ module Ciphr::Functions::ZLib
     def apply
       input = @args[0]
       sio = StringIO.new
+      sio.binmode
       gz = !invert ? Zlib::GzipWriter.new(UncloseableIOProxy.new(sio)) : Zlib::GzipReader.new(input) 
       Proc.new do
         if invert # unzip
