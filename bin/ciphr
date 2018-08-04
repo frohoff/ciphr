@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 
 require 'ciphr'
+require 'readline'
 require 'slop'
 
 Slop.parse do
@@ -8,6 +9,7 @@ Slop.parse do
   on :h, :help
   on :v, :verbose
   on :n, :'no-newline'
+  on :r, :'repl'
   on :N, :'newline'
   on :x, :'xargs-mode'
   on :'0', :null
@@ -23,6 +25,23 @@ Slop.parse do
                 puts "  #{v[0].map{|v|v.to_s}.join(", ")} (#{c.params.map{|p| p.to_s}.join(", ")})"
             }
         end
+    elsif opts[:repl] # REPL mode
+      begin
+        while input = Readline.readline("ciphr> ", true).strip
+	  if input && !input.empty?
+            break if input == "exit"
+            parsed = Ciphr::Parser.new.parse(input)
+            transformed = Ciphr::Transformer.new($stdin).apply(parsed)
+            while (chunk = transformed.read(256)) && ! $stdout.closed?
+                $stdout.print(chunk)
+            end
+	    puts
+	  end
+        end
+      rescue Errno::EPIPE, Interrupt
+	puts
+        exit
+      end
     else
       newline = opts[:newline] || opts[:'xargs-mode'] || STDOUT.tty? && ! opts[:'no-newline']
       spec = args.join(" ")
