@@ -16,7 +16,7 @@ Slop.parse do
 
   run do |opts, args|
     Ciphr::FunctionRegistry.global.setup
-    if opts[:help] || args.size == 0
+    if opts[:help] || args.size == 0 && opts.to_hash.reject{|k,v| v.nil?}.size == 0
         puts opts
         if opts[:verbose]
             puts "Available Functions: aliases ([args])"
