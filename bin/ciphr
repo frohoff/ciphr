@@ -27,7 +27,8 @@ Slop.parse do
         end
     elsif opts[:repl] # REPL mode
       begin
-        while input = Readline.readline("ciphr> ", true).strip
+        while input = Readline.readline("ciphr> ", true)
+	  input = input && input.strip
 	  if input && !input.empty?
             break if input == "exit"
             parsed = Ciphr::Parser.new.parse(input)
@@ -39,9 +40,8 @@ Slop.parse do
 	  end
         end
       rescue Errno::EPIPE, Interrupt
-	puts
-        exit
       end
+      puts
     else
       newline = opts[:newline] || opts[:'xargs-mode'] || STDOUT.tty? && ! opts[:'no-newline']
       spec = args.join(" ")
